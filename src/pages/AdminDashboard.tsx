@@ -7,8 +7,8 @@ import type { Product, Order } from '../context/AppContext';
 import { ProductFormModal } from '../components/ProductFormModal';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as XLSX from 'xlsx';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export function AdminDashboard() {
   const { currentUser, products, addProduct, updateProduct, deleteProduct, orders, updateOrder, deleteOrder } = useAppContext();
@@ -133,7 +133,7 @@ export function AdminDashboard() {
         o.paymentStatus || 'Pending'
       ]);
 
-      (doc as any).autoTable({
+      autoTable(doc, {
         head: [tableColumn],
         body: tableRows,
         startY: 20,
@@ -421,7 +421,6 @@ export function AdminDashboard() {
                                     </div>
                                   </div>
                                 </div>
-                              </div>
                             </td>
                           </tr>
                         )}
