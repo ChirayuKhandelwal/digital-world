@@ -25,9 +25,9 @@ export function Navbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-1.5 text-coolgrey hover:text-midnight transition-colors shrink-0"
+              className="md:hidden p-2.5 text-coolgrey hover:text-midnight transition-colors shrink-0"
             >
-              {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+              {isOpen ? <X className="w-7 h-7 sm:w-8 sm:h-8" /> : <Menu className="w-7 h-7 sm:w-8 sm:h-8" />}
             </button>
             
             {/* Logo */}
@@ -89,33 +89,33 @@ export function Navbar() {
           </div>
 
           {/* Mobile Right Actions */}
-          <div className="flex items-center space-x-1 sm:space-x-2 md:hidden shrink-0">
+          <div className="flex items-center space-x-2 md:hidden shrink-0">
             {currentUser ? (
               <>
-                <Link to={currentUser.role === 'admin' ? "/admin" : "/cart"} className="relative p-1.5 text-coolgrey hover:text-electric transition-colors">
-                  {currentUser.role === 'admin' ? <User className="w-4 h-4 sm:w-5 sm:h-5" /> : <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />}
+                <Link to={currentUser.role === 'admin' ? "/admin" : "/cart"} className="relative p-2.5 text-coolgrey hover:text-electric transition-colors">
+                  {currentUser.role === 'admin' ? <User className="w-7 h-7 sm:w-8 sm:h-8" /> : <ShoppingCart className="w-7 h-7 sm:w-8 sm:h-8" />}
                   {currentUser.role !== 'admin' && cartCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 py-0.5 text-[10px] font-bold leading-none text-white bg-electric rounded-full">
+                    <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-electric rounded-full">
                       {cartCount}
                     </span>
                   )}
                 </Link>
                 <button 
                   onClick={() => { logout(); navigate('/'); }}
-                  className="p-1.5 text-coolgrey hover:text-midnight transition-colors"
+                  className="p-2.5 text-coolgrey hover:text-midnight transition-colors"
                 >
-                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <LogOut className="w-7 h-7 sm:w-8 sm:h-8" />
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="p-1.5 text-coolgrey hover:text-electric transition-colors">
-                  <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Link to="/login" className="p-2.5 text-coolgrey hover:text-electric transition-colors">
+                  <User className="w-7 h-7 sm:w-8 sm:h-8" />
                 </Link>
-                <Link to="/cart" className="relative p-1.5 text-coolgrey hover:text-electric transition-colors">
-                  <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Link to="/cart" className="relative p-2.5 text-coolgrey hover:text-electric transition-colors">
+                  <ShoppingCart className="w-7 h-7 sm:w-8 sm:h-8" />
                   {cartCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 py-0.5 text-[10px] font-bold leading-none text-white bg-electric rounded-full">
+                    <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-electric rounded-full">
                       {cartCount}
                     </span>
                   )}
