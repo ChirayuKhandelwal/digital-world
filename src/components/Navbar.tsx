@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { MonitorPlay, Menu, X, LogOut, ShoppingCart } from "lucide-react";
+import { MonitorPlay, Menu, X, LogOut, ShoppingCart, User } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../utils/cn";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,15 +21,26 @@ export function Navbar() {
     <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="p-2 bg-neon-cyan/10 rounded-lg group-hover:bg-neon-cyan/20 transition-colors">
-              <MonitorPlay className="w-6 h-6 text-neon-cyan" />
-            </div>
-            <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-              DIGITAL WORLD
-            </span>
-          </Link>
+          {/* Mobile Nav Toggle & Logo */}
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+            
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2 group">
+              <div className="p-1.5 md:p-2 bg-neon-cyan/10 rounded-lg group-hover:bg-neon-cyan/20 transition-colors">
+                <MonitorPlay className="w-5 h-5 md:w-6 md:h-6 text-neon-cyan" />
+              </div>
+              <span className="font-bold text-sm sm:text-base md:text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                DIGITAL WORLD
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-8">
@@ -78,14 +89,40 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-slate-400 hover:text-white"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+          {/* Mobile Right Actions */}
+          <div className="flex items-center space-x-3 md:hidden">
+            {currentUser ? (
+              <>
+                <Link to={currentUser.role === 'admin' ? "/admin" : "/cart"} className="relative p-2 text-slate-400 hover:text-neon-cyan transition-colors">
+                  {currentUser.role === 'admin' ? <User className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5" />}
+                  {currentUser.role !== 'admin' && cartCount > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-slate-950 bg-neon-cyan rounded-full">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+                <button 
+                  onClick={() => { logout(); navigate('/'); }}
+                  className="p-2 text-slate-400 hover:text-white transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="p-2 text-slate-400 hover:text-neon-cyan transition-colors">
+                  <User className="w-5 h-5" />
+                </Link>
+                <Link to="/cart" className="relative p-2 text-slate-400 hover:text-neon-cyan transition-colors">
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-slate-950 bg-neon-cyan rounded-full">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
