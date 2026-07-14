@@ -229,7 +229,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const placeOrder = async (customer: { name: string; email: string; phone: string }) => {
-    if (!currentUser || currentUser.cart.length === 0) return;
+    console.log("placeOrder triggered with customer:", customer);
+    
+    if (!currentUser) {
+      console.error("placeOrder aborted: No currentUser found.");
+      return;
+    }
+    if (currentUser.cart.length === 0) {
+      console.warn("placeOrder aborted: Cart is empty.");
+      return;
+    }
     
     const total = currentUser.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
     const orderData = {
@@ -239,14 +248,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       total,
       date: new Date().toISOString()
     };
+    
+    console.log("Constructed order data:", orderData);
 
     if (db) {
+      console.log("Firebase 'db' instance detected. Attempting to push to Firestore...");
       try {
-        await addDoc(collection(db, 'orders'), orderData);
+        const docRef = await addDoc(collection(db, 'orders'), orderData);
+        console.log("Firebase success! Document written with ID: ", docRef.id);
       } catch (e) {
-        console.error("Error adding document: ", e);
+        console.error("FIREBASE ERROR: Failed to add document to Firestore.", e);
+        console.error("Hint: Check your Firestore Security Rules (they might be defaulting to 'allow read, write: if false;')");
       }
     } else {
+      console.warn("Firebase 'db' instance NOT detected. Falling back to localStorage.");
       setOrders(prev => [{ ...orderData, id: `ord-${Date.now()}` }, ...prev]);
     }
 
