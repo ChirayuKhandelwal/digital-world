@@ -37,8 +37,9 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
     }
   }, [product]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const submitData = {
       ...(product ? { id: product.id } : {}),
       name: formData.name,
@@ -106,8 +107,8 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Image URL</label>
-              <input required type="url" value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon-cyan/50" />
+              <label className="block text-sm font-medium text-slate-300 mb-1">Image URL (GitHub Raw Link)</label>
+              <input required type="url" placeholder="https://raw.githubusercontent.com/..." value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon-cyan/50" />
             </div>
 
             <div>

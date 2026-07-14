@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { products as initialProducts, CATEGORY_LIST } from '../data/mockData';
 import { db } from '../lib/firebase';
-import { collection, onSnapshot, addDoc, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 
 export type Category = typeof CATEGORY_LIST[number];
 
@@ -90,17 +90,57 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('digital_world_products', JSON.stringify(products));
   }, [products]);
 
-  const addProduct = (productData: Omit<Product, 'id'>) => {
-    const newProduct: Product = { ...productData, id: `p-${Date.now()}` };
-    setProducts(prev => [...prev, newProduct]);
+  useEffect(() => {
+    if (!db) return;
+    const unsubscribe = onSnapshot(collection(db, 'products'), (querySnapshot) => {
+      const fetchedProducts: Product[] = [];
+      querySnapshot.forEach((doc) => {
+        fetchedProducts.push({ ...doc.data(), id: doc.id } as Product);
+      });
+      if (fetchedProducts.length > 0) {
+        setProducts(fetchedProducts);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const addProduct = async (productData: Omit<Product, 'id'>) => {
+    if (db) {
+      try {
+        await addDoc(collection(db, 'products'), productData);
+      } catch (e) {
+        console.error("Error adding product: ", e);
+      }
+    } else {
+      const newProduct: Product = { ...productData, id: `p-${Date.now()}` };
+      setProducts(prev => [...prev, newProduct]);
+    }
   };
 
-  const updateProduct = (updatedProduct: Product) => {
-    setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+  const updateProduct = async (updatedProduct: Product) => {
+    if (db) {
+      try {
+        const productRef = doc(db, 'products', updatedProduct.id);
+        const { id, ...dataToUpdate } = updatedProduct;
+        await updateDoc(productRef, dataToUpdate);
+      } catch (e) {
+        console.error("Error updating product: ", e);
+      }
+    } else {
+      setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+    }
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
+  const deleteProduct = async (id: string) => {
+    if (db && !id.startsWith('p-')) {
+      try {
+        await deleteDoc(doc(db, 'products', id));
+      } catch (e) {
+        console.error("Error deleting product: ", e);
+      }
+    } else {
+      setProducts(prev => prev.filter(p => p.id !== id));
+    }
   };
 
   // --- Orders ---
@@ -159,6 +199,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     
     setUsers(prev => [...prev, newUser]);
     setCurrentUser(newUser); // Auto login
+
+    // Push to customers collection for security and future Auth
+    if (db && newUser.role === 'customer') {
+      try {
+        addDoc(collection(db, 'customers'), {
+          name: newUser.name,
+          email: newUser.email,
+          mobile: newUser.mobile,
+          registeredAt: new Date().toISOString()
+        });
+      } catch (e) {
+        console.error("Error saving customer to Firebase: ", e);
+      }
+    }
+
     return true;
   };
 
