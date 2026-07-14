@@ -60,7 +60,7 @@ export function Catalog() {
       <div className="bg-alabaster border-b border-gray-200 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-midnight mb-4">Complete Catalog</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-midnight mb-4">Catalog</h1>
             <p className="text-coolgrey max-w-2xl text-lg">
               Browse a wide range of home appliances and electronics from trusted brands at competitive retail and wholesale prices.
             </p>

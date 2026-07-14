@@ -47,13 +47,17 @@ export function Hero() {
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link 
-              to="/#catalog"
+            <a 
+              href="#catalog"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-electric text-white font-bold text-lg hover:bg-electric/90 transition-all shadow-lg shadow-electric/30 flex items-center justify-center space-x-2"
             >
               <span>Explore Products</span>
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
             <Link 
               to="/contact"
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white border border-gray-200 text-midnight font-bold text-lg hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-center space-x-2"

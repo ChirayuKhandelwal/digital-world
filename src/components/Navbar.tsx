@@ -13,14 +13,13 @@ export function Navbar() {
 
   const links = [
     { name: "Home", path: "/" },
-    { name: "Catalog", path: "/#catalog" },
     { name: "Contact", path: "/contact" },
   ];
 
   return (
     <nav className="fixed top-0 w-full max-w-[100vw] overflow-x-hidden box-border z-50 border-b border-gray-200 bg-white/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 box-border">
-        <div className="flex items-center justify-between h-16 w-full">
+        <div className="flex items-center justify-between h-24 py-4 w-full">
           {/* Mobile Nav Toggle & Logo */}
           <div className="flex items-center space-x-1 md:space-x-4 min-w-0 flex-shrink">
             {/* Mobile menu button */}
