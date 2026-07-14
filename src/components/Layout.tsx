@@ -4,11 +4,11 @@ import { Footer } from "./Footer";
 
 export function Layout() {
   return (
-    <div className="min-h-screen flex flex-col selection:bg-neon-cyan/30 selection:text-white">
+    <div className="min-h-screen flex flex-col selection:bg-electric/20 selection:text-midnight">
       {/* Background glow effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-neon-cyan/20 blur-[150px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-neon-fuchsia/20 blur-[150px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-electric/5 blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/5 blur-[120px]" />
       </div>
 
       <Navbar />

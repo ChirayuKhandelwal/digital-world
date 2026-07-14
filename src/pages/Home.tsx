@@ -4,7 +4,7 @@ import { ValuePropositions } from "../components/ValuePropositions";
 
 export function Home() {
   return (
-    <div className="w-full max-w-[100vw] overflow-x-hidden m-0 p-0 box-border bg-slate-950">
+    <div className="w-full max-w-[100vw] overflow-x-hidden m-0 p-0 box-border bg-alabaster">
       <Hero />
       
       {/* Main Content Area */}

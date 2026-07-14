@@ -150,20 +150,20 @@ export function AdminDashboard() {
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
-          <p className="text-slate-400 mt-1">Manage DIGITAL WORLD inventory and orders</p>
+          <h1 className="text-3xl font-bold text-midnight">Admin Dashboard</h1>
+          <p className="text-coolgrey mt-1">Manage DIGITAL WORLD inventory and orders</p>
         </div>
         
-        <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10 w-full md:w-auto overflow-x-auto shrink-0">
+        <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200 w-full md:w-auto overflow-x-auto shrink-0">
           <button
             onClick={() => setActiveTab('products')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'products' ? 'bg-neon-cyan text-slate-950 shadow-[0_0_15px_rgba(0,243,255,0.3)]' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'products' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
           >
             Products
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-neon-cyan text-slate-950 shadow-[0_0_15px_rgba(0,243,255,0.3)]' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
           >
             Orders
           </button>
@@ -172,7 +172,7 @@ export function AdminDashboard() {
         {activeTab === 'products' && (
           <button 
             onClick={handleAddNew}
-            className="flex items-center space-x-2 bg-neon-cyan text-slate-950 px-4 py-2 rounded-xl font-bold hover:bg-cyan-400 shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all shrink-0"
+            className="flex items-center space-x-2 bg-electric text-white px-4 py-2 rounded-xl font-bold hover:bg-electric/90 shadow-md shadow-electric/20 transition-all shrink-0"
           >
             <Plus className="w-5 h-5" />
             <span>Add New Product</span>
@@ -181,35 +181,35 @@ export function AdminDashboard() {
       </div>
 
       {activeTab === 'orders' && (
-        <div className="bg-slate-900/80 backdrop-blur-md p-4 rounded-xl border border-white/10 mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between">
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coolgrey" />
               <input 
                 type="text" 
                 placeholder="Search Name, Phone, ID..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-black/30 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm text-midnight focus:outline-none focus:border-electric focus:ring-2 focus:ring-electric/50 transition-colors"
               />
             </div>
             
             <div className="relative w-full sm:w-48">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coolgrey" />
               <input 
                 type="date" 
                 value={dateFilter}
                 onChange={e => setDateFilter(e.target.value)}
-                className="w-full bg-black/30 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan [color-scheme:dark]"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm text-midnight focus:outline-none focus:border-electric focus:ring-2 focus:ring-electric/50 transition-colors"
               />
             </div>
 
             <div className="relative w-full sm:w-48">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coolgrey" />
               <select 
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value)}
-                className="w-full bg-black/30 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan appearance-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm text-midnight focus:outline-none focus:border-electric focus:ring-2 focus:ring-electric/50 appearance-none transition-colors"
               >
                 <option value="">All Statuses</option>
                 <option value="Pending">Pending</option>
@@ -220,21 +220,21 @@ export function AdminDashboard() {
           </div>
           
           <div className="flex gap-2 w-full lg:w-auto">
-            <button onClick={handleExportExcel} className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-green-500/20 text-green-400 border border-green-500/30 px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-500/30 transition-colors">
+            <button onClick={handleExportExcel} className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-green-50 text-green-600 border border-green-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors">
               <Download className="w-4 h-4" /> Excel
             </button>
-            <button onClick={handleExportPDF} className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-colors">
+            <button onClick={handleExportPDF} className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
               <Download className="w-4 h-4" /> PDF
             </button>
           </div>
         </div>
       )}
 
-      <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-black/5">
         {activeTab === 'products' ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-400">
-            <thead className="bg-white/5 text-xs uppercase text-slate-300 border-b border-white/10">
+            <table className="w-full text-left text-sm text-coolgrey">
+            <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
               <tr>
                 <th scope="col" className="px-6 py-4">Product Name</th>
                 <th scope="col" className="px-6 py-4">Category</th>
@@ -245,31 +245,31 @@ export function AdminDashboard() {
             </thead>
             <tbody>
               {products.map((product) => (
-                <tr key={product.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td className="px-6 py-4 font-medium text-white flex items-center space-x-3">
-                    <img src={product.image} alt={product.name} className="w-10 h-10 rounded object-cover border border-white/10" />
+                <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 font-bold text-midnight flex items-center space-x-3">
+                    <img src={product.image} alt={product.name} className="w-10 h-10 rounded object-cover border border-gray-200" />
                     <span>{product.name}</span>
                   </td>
                   <td className="px-6 py-4">{product.category}</td>
-                  <td className="px-6 py-4">₹{product.price.toLocaleString()}</td>
+                  <td className="px-6 py-4 font-medium text-electric">₹{product.price.toLocaleString()}</td>
                   <td className="px-6 py-4">
                     {product.featured ? (
-                      <span className="px-2 py-1 bg-neon-cyan/20 text-neon-cyan rounded text-xs font-medium border border-neon-cyan/30">Yes</span>
+                      <span className="px-2 py-1 bg-electric/10 text-electric rounded text-xs font-bold border border-electric/20">Yes</span>
                     ) : (
-                      <span className="px-2 py-1 bg-slate-800 text-slate-400 rounded text-xs font-medium border border-white/10">No</span>
+                      <span className="px-2 py-1 bg-gray-100 text-coolgrey rounded text-xs font-medium border border-gray-200">No</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
                     <button 
                       onClick={() => handleEdit(product)}
-                      className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"
+                      className="p-2 bg-gray-50 hover:bg-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors border border-transparent hover:border-gray-200"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleDeleteProduct(product.id)}
-                      className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                      className="p-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors border border-transparent hover:border-red-200"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -279,7 +279,7 @@ export function AdminDashboard() {
               ))}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
                     No products found. Add some to get started.
                   </td>
                 </tr>
@@ -289,8 +289,8 @@ export function AdminDashboard() {
         </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-400 whitespace-nowrap">
-              <thead className="bg-white/5 text-xs uppercase text-slate-300 border-b border-white/10">
+            <table className="w-full text-left text-sm text-coolgrey whitespace-nowrap">
+              <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
                 <tr>
                   <th scope="col" className="px-4 py-4 w-12 text-center">#</th>
                   <th scope="col" className="px-4 py-4">Order ID</th>
@@ -310,26 +310,26 @@ export function AdminDashboard() {
                   return (
                     <React.Fragment key={order.id}>
                       <tr 
-                        className={`border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer ${isExpanded ? 'bg-white/5' : ''}`}
+                        className={`border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${isExpanded ? 'bg-gray-50' : ''}`}
                         onClick={() => toggleOrderExpand(order.id)}
                       >
-                        <td className="px-4 py-4 text-center font-medium text-slate-500">{index + 1}</td>
-                        <td className="px-4 py-4 font-medium text-white">{order.id}</td>
+                        <td className="px-4 py-4 text-center font-medium text-gray-400">{index + 1}</td>
+                        <td className="px-4 py-4 font-bold text-midnight">{order.id}</td>
                         <td className="px-4 py-4">
-                          <div className="text-white">{order.date ? orderDate.toLocaleDateString() : 'N/A'}</div>
-                          <div className="text-xs text-slate-500">{order.date ? orderDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
+                          <div className="text-midnight">{order.date ? orderDate.toLocaleDateString() : 'N/A'}</div>
+                          <div className="text-xs text-gray-500">{order.date ? orderDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
                         </td>
                         <td className="px-4 py-4">
-                          <div className="font-medium text-white">{order.customer?.name || 'Guest'}</div>
-                          <div className="text-xs text-slate-400">{order.customer?.phone}</div>
+                          <div className="font-bold text-midnight">{order.customer?.name || 'Guest'}</div>
+                          <div className="text-xs text-gray-500">{order.customer?.phone}</div>
                         </td>
-                        <td className="px-4 py-4 font-bold text-neon-cyan">₹{order.total?.toLocaleString() || 0}</td>
+                        <td className="px-4 py-4 font-bold text-electric">₹{order.total?.toLocaleString() || 0}</td>
                         <td className="px-4 py-4">
                           <select 
                             value={order.status || 'Pending'}
                             onChange={(e) => updateOrder(order.id, { status: e.target.value as Order['status'] })}
                             onClick={e => e.stopPropagation()}
-                            className="bg-black/30 border border-white/10 rounded px-2 py-1 text-xs font-medium text-white focus:outline-none focus:border-neon-cyan"
+                            className="bg-white border border-gray-200 rounded px-2 py-1 text-xs font-medium text-midnight focus:outline-none focus:border-electric focus:ring-1 focus:ring-electric shadow-sm"
                           >
                             <option value="Pending">Pending</option>
                             <option value="Processing">Processing</option>
@@ -341,9 +341,9 @@ export function AdminDashboard() {
                             value={order.paymentStatus || 'Pending'}
                             onChange={(e) => updateOrder(order.id, { paymentStatus: e.target.value as Order['paymentStatus'] })}
                             onClick={e => e.stopPropagation()}
-                            className={`bg-black/30 border border-white/10 rounded px-2 py-1 text-xs font-medium focus:outline-none focus:border-neon-cyan ${
-                              order.paymentStatus === 'Paid' ? 'text-green-400' :
-                              order.paymentStatus === 'COD' ? 'text-blue-400' : 'text-yellow-400'
+                            className={`bg-white border border-gray-200 rounded px-2 py-1 text-xs font-medium focus:outline-none focus:border-electric focus:ring-1 focus:ring-electric shadow-sm ${
+                              order.paymentStatus === 'Paid' ? 'text-green-600' :
+                              order.paymentStatus === 'COD' ? 'text-blue-600' : 'text-yellow-600'
                             }`}
                           >
                             <option value="Pending">Pending</option>
@@ -354,14 +354,14 @@ export function AdminDashboard() {
                         <td className="px-4 py-4 text-right space-x-2">
                           <button 
                             onClick={(e) => { e.stopPropagation(); toggleOrderExpand(order.id); }}
-                            className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"
+                            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors border border-transparent hover:border-gray-200"
                             title={isExpanded ? "Collapse Details" : "Expand Details"}
                           >
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </button>
                           <button 
                             onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order.id); }}
-                            className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                            className="p-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors border border-transparent hover:border-red-200"
                             title="Delete Order"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -370,51 +370,51 @@ export function AdminDashboard() {
                       </tr>
                       
                       {isExpanded && (
-                        <tr className="bg-black/20 border-b border-white/5">
+                        <tr className="bg-gray-50 border-b border-gray-200">
                           <td colSpan={8} className="p-0 border-none">
                             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-300">
                                   {/* Customer Full Details */}
-                                  <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 h-fit">
-                                    <h4 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">Customer Details</h4>
+                                  <div className="bg-white p-4 rounded-xl border border-gray-200 h-fit shadow-sm">
+                                    <h4 className="text-midnight font-bold mb-4 border-b border-gray-100 pb-2">Customer Details</h4>
                                     <div className="space-y-2 text-sm">
-                                      <p><span className="text-slate-500">Name:</span> <span className="text-white ml-2">{order.customer?.name}</span></p>
-                                      <p><span className="text-slate-500">Email:</span> <span className="text-white ml-2">{order.customer?.email}</span></p>
-                                      <p><span className="text-slate-500">Phone:</span> <span className="text-white ml-2">{order.customer?.phone}</span></p>
+                                      <p><span className="text-gray-500">Name:</span> <span className="text-midnight font-medium ml-2">{order.customer?.name}</span></p>
+                                      <p><span className="text-gray-500">Email:</span> <span className="text-midnight font-medium ml-2">{order.customer?.email}</span></p>
+                                      <p><span className="text-gray-500">Phone:</span> <span className="text-midnight font-medium ml-2">{order.customer?.phone}</span></p>
                                       {order.customer?.address && (
-                                        <div className="pt-2 mt-2 border-t border-white/5">
-                                          <span className="text-slate-500 block mb-1">Address:</span>
-                                          <p className="text-white bg-black/20 p-2 rounded border border-white/5 whitespace-pre-wrap leading-relaxed">{order.customer.address}</p>
+                                        <div className="pt-2 mt-2 border-t border-gray-100">
+                                          <span className="text-gray-500 block mb-1">Address:</span>
+                                          <p className="text-midnight bg-gray-50 p-2 rounded border border-gray-100 whitespace-pre-wrap leading-relaxed">{order.customer.address}</p>
                                         </div>
                                       )}
                                     </div>
                                   </div>
 
                                   {/* Order Items Table */}
-                                  <div className="md:col-span-2 bg-slate-900/50 p-4 rounded-xl border border-white/5">
-                                    <h4 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">Order Items</h4>
+                                  <div className="md:col-span-2 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                                    <h4 className="text-midnight font-bold mb-4 border-b border-gray-100 pb-2">Order Items</h4>
                                     <div className="overflow-x-auto">
-                                      <table className="w-full text-left text-sm text-slate-400">
-                                        <thead className="bg-black/30 text-xs text-slate-500">
+                                      <table className="w-full text-left text-sm text-coolgrey">
+                                        <thead className="bg-gray-50 text-xs text-gray-500">
                                           <tr>
-                                            <th className="px-4 py-2 rounded-l-lg">Product</th>
-                                            <th className="px-4 py-2">Qty</th>
-                                            <th className="px-4 py-2 text-right rounded-r-lg">Price</th>
+                                            <th className="px-4 py-2 rounded-l-lg font-bold">Product</th>
+                                            <th className="px-4 py-2 font-bold">Qty</th>
+                                            <th className="px-4 py-2 text-right rounded-r-lg font-bold">Price</th>
                                           </tr>
                                         </thead>
                                         <tbody>
                                           {order.items.map((item, i) => (
-                                            <tr key={i} className="border-b border-white/5 last:border-0">
-                                              <td className="px-4 py-3 text-white flex items-center gap-3">
-                                                <img src={item.product.image} className="w-8 h-8 rounded object-cover" alt="" />
+                                            <tr key={i} className="border-b border-gray-100 last:border-0">
+                                              <td className="px-4 py-3 text-midnight font-medium flex items-center gap-3">
+                                                <img src={item.product.image} className="w-8 h-8 rounded object-cover border border-gray-100" alt="" />
                                                 <span>{item.product.name}</span>
                                               </td>
                                               <td className="px-4 py-3">{item.quantity}</td>
                                               <td className="px-4 py-3 text-right">₹{(item.product.price * item.quantity).toLocaleString()}</td>
                                             </tr>
                                           ))}
-                                          <tr className="bg-black/30">
-                                            <td colSpan={2} className="px-4 py-3 text-right font-semibold text-white rounded-l-lg">Grand Total</td>
-                                            <td className="px-4 py-3 text-right font-bold text-neon-cyan rounded-r-lg">₹{order.total.toLocaleString()}</td>
+                                          <tr className="bg-gray-50">
+                                            <td colSpan={2} className="px-4 py-3 text-right font-bold text-midnight rounded-l-lg border-t border-gray-200">Grand Total</td>
+                                            <td className="px-4 py-3 text-right font-bold text-electric rounded-r-lg border-t border-gray-200">₹{order.total.toLocaleString()}</td>
                                           </tr>
                                         </tbody>
                                       </table>
@@ -429,7 +429,7 @@ export function AdminDashboard() {
                 })}
                 {filteredOrders.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={8} className="px-6 py-12 text-center text-gray-400">
                       No orders found matching your filters.
                     </td>
                   </tr>

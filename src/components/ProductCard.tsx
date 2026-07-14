@@ -31,34 +31,34 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       whileHover={{ y: -5 }}
-      className="group relative bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 hover:bg-white/[0.04] transition-all duration-300"
+      className="group relative bg-white shadow-xl shadow-black/5 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-black/10 transition-all duration-300"
     >
-      <div className="aspect-[4/3] overflow-hidden bg-slate-900/50 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent z-10" />
+      <div className="aspect-[4/3] overflow-hidden bg-gray-100 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
         <img 
           src={product.image} 
           alt={product.name}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute bottom-4 left-4 z-20">
-          <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-medium text-white border border-white/20">
+          <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-medium text-white border border-white/30">
             {product.category}
           </span>
         </div>
       </div>
 
       <div className="p-6">
-        <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
-        <p className="text-slate-400 text-sm line-clamp-2 mb-4">{product.description}</p>
+        <h3 className="text-xl font-bold text-midnight mb-2">{product.name}</h3>
+        <p className="text-coolgrey text-sm line-clamp-2 mb-4">{product.description}</p>
         
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-white">
+          <span className="text-2xl font-bold text-midnight">
             ₹{product.price.toLocaleString()}
           </span>
           <div className="flex space-x-2">
             <button 
               onClick={() => onQuickView(product)}
-              className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+              className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors"
               aria-label="Quick view"
             >
               <Eye className="w-5 h-5" />
@@ -67,14 +67,14 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
               <>
                 <button 
                   onClick={() => onEdit?.(product)}
-                  className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+                  className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-electric transition-colors"
                   aria-label="Edit product"
                 >
                   <Edit2 className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => onDelete?.(product.id)}
-                  className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 hover:text-red-300 transition-all hover:shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+                  className="p-2 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors"
                   aria-label="Delete product"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -83,7 +83,7 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
             ) : (
               <button 
                 onClick={handleAddToCart}
-                className="p-2 bg-neon-cyan/10 hover:bg-neon-cyan/20 border border-neon-cyan/20 rounded-lg text-neon-cyan transition-all hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]"
+                className="p-2 bg-electric text-white hover:bg-electric/90 border border-transparent rounded-lg transition-all shadow-sm hover:shadow-md hover:shadow-electric/20"
                 aria-label="Add to cart"
               >
                 <ShoppingCart className="w-5 h-5" />

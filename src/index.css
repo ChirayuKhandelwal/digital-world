@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-slate-950: #020617;
-  --color-neon-cyan: #00f3ff;
-  --color-neon-fuchsia: #f000ff;
+  --color-alabaster: #F5F5F7;
+  --color-midnight: #1D1D1F;
+  --color-coolgrey: #86868B;
+  --color-electric: #4A6CF7;
+  --color-surface: #FFFFFF;
 }
 
 @layer base {
@@ -12,10 +14,11 @@
   }
   
   body {
-    background-color: var(--color-slate-950);
-    color: white;
+    background-color: var(--color-alabaster);
+    color: var(--color-midnight);
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 }
+

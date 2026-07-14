@@ -57,11 +57,11 @@ export function Catalog() {
 
   return (
     <div id="catalog" className="w-full">
-      <div className="bg-slate-900 border-b border-white/10 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="bg-alabaster border-b border-gray-200 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Complete Catalog</h1>
-            <p className="text-slate-400 max-w-2xl text-lg">
+            <h1 className="text-4xl md:text-5xl font-bold text-midnight mb-4">Complete Catalog</h1>
+            <p className="text-coolgrey max-w-2xl text-lg">
               Browse a wide range of home appliances and electronics from trusted brands at competitive retail and wholesale prices.
             </p>
           </div>
@@ -71,7 +71,7 @@ export function Catalog() {
             {currentUser?.role === 'admin' && (
               <button 
                 onClick={handleAddNew}
-                className="flex items-center justify-center gap-2 px-5 py-3 bg-neon-cyan text-slate-950 rounded-xl font-bold hover:bg-white transition-colors shadow-[0_0_15px_rgba(0,243,255,0.4)] hover:shadow-[0_0_25px_rgba(0,243,255,0.6)] whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-5 py-3 bg-electric text-white rounded-xl font-bold hover:bg-electric/90 transition-colors shadow-md shadow-electric/20 whitespace-nowrap"
               >
                 <Plus className="w-5 h-5" />
                 <span>Add Product</span>
@@ -79,22 +79,22 @@ export function Catalog() {
             )}
             <div className="flex items-center relative w-full sm:w-72 shrink-0">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <SlidersHorizontal className="w-5 h-5 text-neon-cyan" />
+                <SlidersHorizontal className="w-5 h-5 text-electric" />
               </div>
               <select
               value={activeCategory}
               onChange={(e) => setActiveCategory(e.target.value as 'All' | Category)}
-              className="w-full pl-12 pr-10 py-3 bg-slate-800/50 backdrop-blur-md border border-white/10 hover:border-white/20 rounded-xl text-white font-medium focus:outline-none focus:ring-2 focus:ring-neon-cyan/50 appearance-none cursor-pointer transition-all shadow-lg"
+              className="w-full pl-12 pr-10 py-3 bg-white border border-gray-200 hover:border-gray-300 rounded-xl text-midnight font-medium focus:outline-none focus:ring-2 focus:ring-electric/50 appearance-none cursor-pointer transition-all shadow-sm"
               style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
             >
               {CATEGORIES.map(category => (
-                <option key={category} value={category} className="bg-slate-900 text-white py-2">
+                <option key={category} value={category} className="bg-white text-midnight py-2">
                   {category}
                 </option>
               ))}
             </select>
             <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-              <ChevronDown className="w-5 h-5 text-slate-400" />
+              <ChevronDown className="w-5 h-5 text-coolgrey" />
             </div>
           </div>
         </div>

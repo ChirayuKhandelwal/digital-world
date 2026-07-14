@@ -29,60 +29,60 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
       
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-4xl bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
+        className="relative w-full max-w-4xl bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full text-white/70 hover:text-white transition-colors"
+          className="absolute top-4 right-4 z-10 p-2 bg-gray-100 hover:bg-gray-200 backdrop-blur-md rounded-full text-coolgrey hover:text-midnight transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Image Section */}
-        <div className="md:w-1/2 relative bg-slate-950 h-64 md:h-auto shrink-0">
+        <div className="md:w-1/2 relative bg-gray-100 h-64 md:h-auto shrink-0">
           <img 
             src={product.image} 
             alt={product.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent md:bg-gradient-to-r" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent md:bg-gradient-to-r" />
         </div>
 
         {/* Content Section */}
         <div className="md:w-1/2 p-6 md:p-8 overflow-y-auto custom-scrollbar flex flex-col">
-          <span className="text-neon-cyan text-sm font-semibold tracking-wider uppercase mb-2">
+          <span className="text-electric text-sm font-bold tracking-wider uppercase mb-2">
             {product.category}
           </span>
-          <h2 className="text-3xl font-bold text-white mb-4">{product.name}</h2>
+          <h2 className="text-3xl font-bold text-midnight mb-4">{product.name}</h2>
           
-          <div className="text-2xl font-bold text-white mb-6">
+          <div className="text-2xl font-bold text-midnight mb-6">
             ₹{product.price.toLocaleString()}
           </div>
           
-          <p className="text-slate-300 leading-relaxed mb-8">
+          <p className="text-coolgrey leading-relaxed mb-8">
             {product.description}
           </p>
 
           <div className="mb-8 flex-1">
-            <h3 className="text-lg font-semibold text-white mb-4">Technical Specifications</h3>
+            <h3 className="text-lg font-bold text-midnight mb-4">Technical Specifications</h3>
             <ul className="space-y-3">
               {product.specs.map((spec, i) => (
                 <li key={i} className="flex items-start">
-                  <CheckCircle2 className="w-5 h-5 text-neon-cyan mt-0.5 mr-3 shrink-0" />
-                  <span className="text-slate-300">{spec}</span>
+                  <CheckCircle2 className="w-5 h-5 text-electric mt-0.5 mr-3 shrink-0" />
+                  <span className="text-coolgrey">{spec}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="mt-auto pt-6 border-t border-white/10">
+          <div className="mt-auto pt-6 border-t border-gray-200">
             <button 
               onClick={() => {
                 if (!currentUser) {
@@ -93,7 +93,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                 addToCart(product);
                 onClose();
               }}
-              className="w-full bg-neon-cyan text-slate-950 px-6 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(0,243,255,0.4)] transition-all"
+              className="w-full bg-electric text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 hover:bg-electric/90 shadow-md shadow-electric/20 transition-all"
             >
               <ShoppingBag className="w-5 h-5" />
               <span>Add to Cart</span>

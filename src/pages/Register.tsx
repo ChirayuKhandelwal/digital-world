@@ -30,56 +30,56 @@ export function Register() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8 bg-slate-900/50 backdrop-blur-xl p-8 rounded-2xl border border-white/10 shadow-2xl"
+        className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl border border-gray-200 shadow-xl shadow-black/5"
       >
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-neon-cyan/10 rounded-full flex items-center justify-center mb-4">
-            <UserPlus className="h-6 w-6 text-neon-cyan" />
+          <div className="mx-auto h-12 w-12 bg-electric/10 rounded-full flex items-center justify-center mb-4">
+            <UserPlus className="h-6 w-6 text-electric" />
           </div>
-          <h2 className="text-3xl font-extrabold text-white">Create Account</h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <h2 className="text-3xl font-bold text-midnight">Create Account</h2>
+          <p className="mt-2 text-sm text-coolgrey">
             Join DIGITAL WORLD to unlock exclusive deals
           </p>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="rounded-md space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Full Name</label>
+              <label className="block text-sm font-medium text-coolgrey mb-1">Full Name</label>
               <input
                 type="text"
                 required
-                className="appearance-none rounded-xl block w-full px-4 py-3 border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-1 focus:ring-neon-cyan focus:border-neon-cyan sm:text-sm"
+                className="appearance-none rounded-xl block w-full px-4 py-3 border border-gray-200 bg-gray-50 text-midnight focus:outline-none focus:ring-2 focus:ring-electric/50 focus:border-electric sm:text-sm transition-all"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Email Address</label>
+              <label className="block text-sm font-medium text-coolgrey mb-1">Email Address</label>
               <input
                 type="email"
                 required
-                className="appearance-none rounded-xl block w-full px-4 py-3 border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-1 focus:ring-neon-cyan focus:border-neon-cyan sm:text-sm"
+                className="appearance-none rounded-xl block w-full px-4 py-3 border border-gray-200 bg-gray-50 text-midnight focus:outline-none focus:ring-2 focus:ring-electric/50 focus:border-electric sm:text-sm transition-all"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Mobile Number</label>
+              <label className="block text-sm font-medium text-coolgrey mb-1">Mobile Number</label>
               <input
                 type="tel"
                 required
-                className="appearance-none rounded-xl block w-full px-4 py-3 border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-1 focus:ring-neon-cyan focus:border-neon-cyan sm:text-sm"
+                className="appearance-none rounded-xl block w-full px-4 py-3 border border-gray-200 bg-gray-50 text-midnight focus:outline-none focus:ring-2 focus:ring-electric/50 focus:border-electric sm:text-sm transition-all"
                 value={formData.mobile}
                 onChange={(e) => setFormData({...formData, mobile: e.target.value})}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Password</label>
+              <label className="block text-sm font-medium text-coolgrey mb-1">Password</label>
               <input
                 type="password"
                 required
-                className="appearance-none rounded-xl block w-full px-4 py-3 border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-1 focus:ring-neon-cyan focus:border-neon-cyan sm:text-sm"
+                className="appearance-none rounded-xl block w-full px-4 py-3 border border-gray-200 bg-gray-50 text-midnight focus:outline-none focus:ring-2 focus:ring-electric/50 focus:border-electric sm:text-sm transition-all"
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
@@ -87,7 +87,7 @@ export function Register() {
           </div>
 
           {error && (
-            <div className="text-red-400 text-sm text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20">
+            <div className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-lg border border-red-100">
               {error}
             </div>
           )}
@@ -95,7 +95,7 @@ export function Register() {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-slate-950 bg-neon-cyan hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neon-cyan transition-all shadow-[0_0_15px_rgba(0,243,255,0.3)]"
+              className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-electric hover:bg-electric/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-electric transition-all shadow-md shadow-electric/20"
             >
               Sign Up
             </button>
@@ -105,10 +105,10 @@ export function Register() {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
+              <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-slate-900 text-slate-400">Or continue with</span>
+              <span className="px-2 bg-white text-coolgrey">Or continue with</span>
             </div>
           </div>
 
@@ -119,7 +119,7 @@ export function Register() {
                 if (success) navigate('/');
                 else setError('Google sign-in failed. Please try again.');
               }}
-              className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-white/10 rounded-xl text-sm font-medium text-white bg-white/5 hover:bg-white/10 transition-colors"
+              className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-200 rounded-xl text-sm font-medium text-midnight bg-white hover:bg-gray-50 transition-colors shadow-sm"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -133,9 +133,9 @@ export function Register() {
         </div>
 
         <div className="text-center mt-4">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-coolgrey">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-neon-cyan hover:text-cyan-400 transition-colors">
+            <Link to="/login" className="font-medium text-electric hover:text-electric/80 transition-colors">
               Sign In
             </Link>
           </p>
