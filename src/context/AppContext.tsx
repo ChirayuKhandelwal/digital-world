@@ -2,8 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { products as initialProducts, CATEGORY_LIST } from '../data/mockData';
-import { db } from '../lib/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { db, auth } from '../lib/firebase';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 export type Category = typeof CATEGORY_LIST[number];
 
@@ -57,8 +58,8 @@ interface AppContextType {
   // Auth state
   users: User[];
   currentUser: User | null;
-  register: (user: Omit<User, 'id' | 'role' | 'cart'>) => boolean;
-  login: (email: string, password: string) => boolean;
+  register: (user: Omit<User, 'id' | 'role' | 'cart'>) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   
   addToCart: (product: Product) => void;
@@ -169,64 +170,104 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // --- Users & Auth ---
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem('digital_world_users');
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('digital_world_currentUser');
     return saved ? JSON.parse(saved) : null;
   });
 
   useEffect(() => {
-    localStorage.setItem('digital_world_users', JSON.stringify(users));
-  }, [users]);
-
-  useEffect(() => {
-    localStorage.setItem('digital_world_currentUser', JSON.stringify(currentUser));
+    if (currentUser) {
+      localStorage.setItem('digital_world_currentUser', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('digital_world_currentUser');
+    }
   }, [currentUser]);
 
-  const register = (userData: Omit<User, 'id' | 'role' | 'cart'>) => {
-    if (users.some(u => u.email === userData.email)) return false; // Email exists
-
-    const newUser: User = {
-      ...userData,
-      id: `u-${Date.now()}`,
-      role: userData.email === 'admin@digitalworld.com' ? 'admin' : 'customer',
-      cart: []
-    };
-    
-    setUsers(prev => [...prev, newUser]);
-    setCurrentUser(newUser); // Auto login
-
-    // Push to customers collection for security and future Auth
-    if (db && newUser.role === 'customer') {
-      try {
-        addDoc(collection(db, 'customers'), {
-          name: newUser.name,
-          email: newUser.email,
-          mobile: newUser.mobile,
-          registeredAt: new Date().toISOString()
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        let userData: Partial<User> = {
+          name: firebaseUser.displayName || 'User',
+          mobile: '',
+          cart: []
+        };
+        if (db) {
+          try {
+            const userDoc = await getDoc(doc(db, 'customers', firebaseUser.uid));
+            if (userDoc.exists()) {
+              userData = userDoc.data() as Partial<User>;
+            }
+          } catch (e) {
+            console.error("Error fetching customer data", e);
+          }
+        }
+        
+        setCurrentUser({
+          id: firebaseUser.uid,
+          name: userData.name || 'User',
+          email: firebaseUser.email || '',
+          mobile: userData.mobile || '',
+          role: firebaseUser.email === 'krishankhandelwal637@gmail.com' ? 'admin' : 'customer',
+          cart: userData.cart || []
         });
-      } catch (e) {
-        console.error("Error saving customer to Firebase: ", e);
+      } else {
+        setCurrentUser(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const register = async (userData: Omit<User, 'id' | 'role' | 'cart'>): Promise<boolean> => {
+    if (auth && db) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password || '');
+        const firebaseUser = userCredential.user;
+        const role = userData.email === 'krishankhandelwal637@gmail.com' ? 'admin' : 'customer';
+        
+        await setDoc(doc(db, 'customers', firebaseUser.uid), {
+          name: userData.name,
+          email: userData.email,
+          mobile: userData.mobile,
+          role: role,
+          cart: [],
+          registeredAt: new Date().toISOString()
+        }, { merge: true });
+        
+        return true;
+      } catch (error) {
+        console.error("Registration error:", error);
+        return false;
       }
     }
-
-    return true;
+    return false; 
   };
 
-  const login = (email: string, password: string) => {
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      setCurrentUser(user);
-      return true;
+  const login = async (email: string, password: string): Promise<boolean> => {
+    if (auth && db) {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const firebaseUser = userCredential.user;
+        
+        await setDoc(doc(db, 'customers', firebaseUser.uid), {
+          email: firebaseUser.email,
+          lastLogin: new Date().toISOString()
+        }, { merge: true });
+        
+        return true;
+      } catch (error) {
+        console.error("Login error:", error);
+        return false;
+      }
     }
     return false;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (auth) {
+      await signOut(auth);
+    }
     setCurrentUser(null);
   };
 
@@ -246,8 +287,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updatedUser = { ...currentUser, cart: updatedCart };
     setCurrentUser(updatedUser);
     
-    // Update user in users array to persist cart
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    if (db) {
+      setDoc(doc(db, 'customers', updatedUser.id), { cart: updatedCart }, { merge: true }).catch(console.error);
+    }
 
     setToastMessage("Item added to cart!");
     setShowToast(true);
@@ -272,7 +314,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updatedUser = { ...currentUser, cart: updatedCart };
     setCurrentUser(updatedUser);
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    
+    if (db) {
+      setDoc(doc(db, 'customers', updatedUser.id), { cart: updatedCart }, { merge: true }).catch(console.error);
+    }
   };
 
   const deleteFromCart = (productId: string) => {
@@ -280,7 +325,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updatedCart = currentUser.cart.filter(item => item.product.id !== productId);
     const updatedUser = { ...currentUser, cart: updatedCart };
     setCurrentUser(updatedUser);
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    
+    if (db) {
+      setDoc(doc(db, 'customers', updatedUser.id), { cart: updatedCart }, { merge: true }).catch(console.error);
+    }
   };
 
   const placeOrder = async (customer: { name: string; email: string; phone: string }) => {
@@ -322,7 +370,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updatedUser = { ...currentUser, cart: [] };
     setCurrentUser(updatedUser);
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    
+    if (db) {
+      setDoc(doc(db, 'customers', updatedUser.id), { cart: [] }, { merge: true }).catch(console.error);
+    }
 
     setToastMessage("Order placed successfully!");
     setShowToast(true);

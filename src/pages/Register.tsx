@@ -15,13 +15,13 @@ export function Register() {
   const { register } = useAppContext();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = register(formData);
+    const success = await register(formData);
     if (success) {
       navigate('/');
     } else {
-      setError('An account with this email already exists.');
+      setError('Registration failed. Please try again.');
     }
   };
 
