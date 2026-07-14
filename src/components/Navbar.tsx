@@ -18,9 +18,9 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 w-full max-w-[100vw] overflow-hidden z-50 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="fixed top-0 w-full max-w-[100vw] overflow-x-hidden box-border z-50 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 box-border">
+        <div className="flex items-center justify-between h-16 w-full">
           {/* Mobile Nav Toggle & Logo */}
           <div className="flex items-center space-x-1 md:space-x-4 min-w-0 flex-shrink">
             {/* Mobile menu button */}
@@ -90,7 +90,7 @@ export function Navbar() {
           </div>
 
           {/* Mobile Right Actions */}
-          <div className="flex items-center space-x-1 sm:space-x-2 md:hidden shrink-0 ml-1">
+          <div className="flex items-center space-x-1 sm:space-x-2 md:hidden shrink-0">
             {currentUser ? (
               <>
                 <Link to={currentUser.role === 'admin' ? "/admin" : "/cart"} className="relative p-1.5 text-slate-400 hover:text-neon-cyan transition-colors">
