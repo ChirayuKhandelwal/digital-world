@@ -7,7 +7,7 @@ import type { Product, Order } from '../context/AppContext';
 import { ProductFormModal } from '../components/ProductFormModal';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
 export function AdminDashboard() {
@@ -73,13 +73,21 @@ export function AdminDashboard() {
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.customer?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer?.phone.includes(searchQuery) ||
-      order.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q || 
+      (order.customer?.name || '').toLowerCase().includes(q) ||
+      (order.customer?.phone || '').includes(q) ||
+      (order.id || '').toLowerCase().includes(q);
     
-    const orderDate = new Date(order.date).toISOString().split('T')[0];
-    const matchesDate = dateFilter ? orderDate === dateFilter : true;
+    let matchesDate = true;
+    if (dateFilter && order.date) {
+      try {
+        const orderDate = new Date(order.date).toISOString().split('T')[0];
+        matchesDate = orderDate === dateFilter;
+      } catch (e) {
+        matchesDate = false;
+      }
+    }
     
     const matchesStatus = statusFilter ? order.status === statusFilter : true;
 
@@ -87,45 +95,55 @@ export function AdminDashboard() {
   });
 
   const handleExportExcel = () => {
-    const exportData = filteredOrders.map((o, index) => ({
-      'S.No': index + 1,
-      'Order ID': o.id,
-      'Date & Time': new Date(o.date).toLocaleString(),
-      'Customer Name': o.customer?.name,
-      'Mobile Number': o.customer?.phone,
-      'Total Amount': `₹${o.total.toLocaleString()}`,
-      'Order Status': o.status,
-      'Payment Status': o.paymentStatus,
-    }));
+    try {
+      const exportData = filteredOrders.map((o, index) => ({
+        'S.No': index + 1,
+        'Order ID': o.id,
+        'Date & Time': o.date ? new Date(o.date).toLocaleString() : 'N/A',
+        'Customer Name': o.customer?.name || 'Guest',
+        'Mobile Number': o.customer?.phone || 'N/A',
+        'Total Amount': `₹${o.total?.toLocaleString() || 0}`,
+        'Order Status': o.status || 'Pending',
+        'Payment Status': o.paymentStatus || 'Pending',
+      }));
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Orders");
-    XLSX.writeFile(wb, "Orders_Export.xlsx");
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Orders");
+      XLSX.writeFile(wb, "Orders_Export.xlsx");
+    } catch (e) {
+      console.error("Failed to export Excel:", e);
+      alert("Failed to export to Excel. Check console for details.");
+    }
   };
 
   const handleExportPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Orders Report", 14, 15);
-    
-    const tableColumn = ["S.No", "Order ID", "Date & Time", "Customer Name", "Total", "Status", "Payment"];
-    const tableRows = filteredOrders.map((o, index) => [
-      index + 1,
-      o.id,
-      new Date(o.date).toLocaleString(),
-      o.customer?.name,
-      `₹${o.total.toLocaleString()}`,
-      o.status,
-      o.paymentStatus
-    ]);
+    try {
+      const doc = new jsPDF();
+      doc.text("Orders Report", 14, 15);
+      
+      const tableColumn = ["S.No", "Order ID", "Date & Time", "Customer Name", "Total", "Status", "Payment"];
+      const tableRows = filteredOrders.map((o, index) => [
+        index + 1,
+        o.id,
+        o.date ? new Date(o.date).toLocaleString() : 'N/A',
+        o.customer?.name || 'Guest',
+        `₹${o.total?.toLocaleString() || 0}`,
+        o.status || 'Pending',
+        o.paymentStatus || 'Pending'
+      ]);
 
-    (doc as any).autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
-    });
-    
-    doc.save("Orders_Export.pdf");
+      (doc as any).autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+      });
+      
+      doc.save("Orders_Export.pdf");
+    } catch (e) {
+      console.error("Failed to export PDF:", e);
+      alert("Failed to export to PDF. Check console for details.");
+    }
   };
 
   return (
@@ -291,22 +309,26 @@ export function AdminDashboard() {
                   
                   return (
                     <React.Fragment key={order.id}>
-                      <tr className={`border-b border-white/5 hover:bg-white/5 transition-colors ${isExpanded ? 'bg-white/5' : ''}`}>
+                      <tr 
+                        className={`border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer ${isExpanded ? 'bg-white/5' : ''}`}
+                        onClick={() => toggleOrderExpand(order.id)}
+                      >
                         <td className="px-4 py-4 text-center font-medium text-slate-500">{index + 1}</td>
                         <td className="px-4 py-4 font-medium text-white">{order.id}</td>
                         <td className="px-4 py-4">
-                          <div className="text-white">{orderDate.toLocaleDateString()}</div>
-                          <div className="text-xs text-slate-500">{orderDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                          <div className="text-white">{order.date ? orderDate.toLocaleDateString() : 'N/A'}</div>
+                          <div className="text-xs text-slate-500">{order.date ? orderDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
                         </td>
                         <td className="px-4 py-4">
                           <div className="font-medium text-white">{order.customer?.name || 'Guest'}</div>
                           <div className="text-xs text-slate-400">{order.customer?.phone}</div>
                         </td>
-                        <td className="px-4 py-4 font-bold text-neon-cyan">₹{order.total.toLocaleString()}</td>
+                        <td className="px-4 py-4 font-bold text-neon-cyan">₹{order.total?.toLocaleString() || 0}</td>
                         <td className="px-4 py-4">
                           <select 
-                            value={order.status}
+                            value={order.status || 'Pending'}
                             onChange={(e) => updateOrder(order.id, { status: e.target.value as Order['status'] })}
+                            onClick={e => e.stopPropagation()}
                             className="bg-black/30 border border-white/10 rounded px-2 py-1 text-xs font-medium text-white focus:outline-none focus:border-neon-cyan"
                           >
                             <option value="Pending">Pending</option>
@@ -316,8 +338,9 @@ export function AdminDashboard() {
                         </td>
                         <td className="px-4 py-4">
                           <select 
-                            value={order.paymentStatus}
+                            value={order.paymentStatus || 'Pending'}
                             onChange={(e) => updateOrder(order.id, { paymentStatus: e.target.value as Order['paymentStatus'] })}
+                            onClick={e => e.stopPropagation()}
                             className={`bg-black/30 border border-white/10 rounded px-2 py-1 text-xs font-medium focus:outline-none focus:border-neon-cyan ${
                               order.paymentStatus === 'Paid' ? 'text-green-400' :
                               order.paymentStatus === 'COD' ? 'text-blue-400' : 'text-yellow-400'
@@ -330,14 +353,14 @@ export function AdminDashboard() {
                         </td>
                         <td className="px-4 py-4 text-right space-x-2">
                           <button 
-                            onClick={() => toggleOrderExpand(order.id)}
+                            onClick={(e) => { e.stopPropagation(); toggleOrderExpand(order.id); }}
                             className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"
                             title={isExpanded ? "Collapse Details" : "Expand Details"}
                           >
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </button>
                           <button 
-                            onClick={() => handleDeleteOrder(order.id)}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order.id); }}
                             className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg text-red-400 hover:text-red-300 transition-colors"
                             title="Delete Order"
                           >
@@ -346,17 +369,10 @@ export function AdminDashboard() {
                         </td>
                       </tr>
                       
-                      <AnimatePresence>
-                        {isExpanded && (
-                          <tr className="bg-black/20 border-b border-white/5">
-                            <td colSpan={8} className="p-0 border-none">
-                              <motion.div 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {isExpanded && (
+                        <tr className="bg-black/20 border-b border-white/5">
+                          <td colSpan={8} className="p-0 border-none">
+                            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-300">
                                   {/* Customer Full Details */}
                                   <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 h-fit">
                                     <h4 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">Customer Details</h4>
@@ -405,11 +421,10 @@ export function AdminDashboard() {
                                     </div>
                                   </div>
                                 </div>
-                              </motion.div>
+                              </div>
                             </td>
                           </tr>
                         )}
-                      </AnimatePresence>
                     </React.Fragment>
                   );
                 })}
