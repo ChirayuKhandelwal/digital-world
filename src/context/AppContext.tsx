@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { products as initialProducts, CATEGORY_LIST } from '../data/mockData';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, addDoc, query, orderBy } from 'firebase/firestore';
 
 export type Category = typeof CATEGORY_LIST[number];
 
@@ -111,6 +113,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('digital_world_orders', JSON.stringify(orders));
   }, [orders]);
 
+  useEffect(() => {
+    if (!db) return; // Fallback to localStorage if no Firebase config
+
+    const q = query(collection(db, 'orders'), orderBy('date', 'desc'));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedOrders: Order[] = [];
+      querySnapshot.forEach((doc) => {
+        fetchedOrders.push({ ...doc.data(), id: doc.id } as Order);
+      });
+      setOrders(fetchedOrders);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // --- Users & Auth ---
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem('digital_world_users');
@@ -211,12 +228,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
   };
 
-  const placeOrder = (customer: { name: string; email: string; phone: string }) => {
+  const placeOrder = async (customer: { name: string; email: string; phone: string }) => {
     if (!currentUser || currentUser.cart.length === 0) return;
     
     const total = currentUser.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-    const newOrder: Order = {
-      id: `ord-${Date.now()}`,
+    const orderData = {
       userId: currentUser.id,
       customer,
       items: [...currentUser.cart],
@@ -224,7 +240,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       date: new Date().toISOString()
     };
 
-    setOrders(prev => [newOrder, ...prev]);
+    if (db) {
+      try {
+        await addDoc(collection(db, 'orders'), orderData);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    } else {
+      setOrders(prev => [{ ...orderData, id: `ord-${Date.now()}` }, ...prev]);
+    }
 
     const updatedUser = { ...currentUser, cart: [] };
     setCurrentUser(updatedUser);
