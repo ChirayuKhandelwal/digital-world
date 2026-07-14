@@ -1,5 +1,5 @@
 import { Hero } from "../components/Hero";
-import { Catalog } from "./Catalog";
+import { Catalog } from "../components/Catalog";
 import { ValuePropositions } from "../components/ValuePropositions";
 
 export function Home() {

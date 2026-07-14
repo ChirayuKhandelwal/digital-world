@@ -36,7 +36,7 @@ export function Cart() {
       {cartItems.length === 0 ? (
         <div className="text-center py-20 bg-slate-900/50 border border-white/10 rounded-2xl backdrop-blur-md">
           <p className="text-xl text-slate-400 mb-6">Your cart is currently empty.</p>
-          <Link to="/catalog" className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl border border-white/20 transition-all">
+          <Link to="/#catalog" className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl border border-white/20 transition-all">
             Continue Shopping
           </Link>
         </div>

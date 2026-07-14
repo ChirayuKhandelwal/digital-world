@@ -48,7 +48,7 @@ export function Hero() {
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link 
-              to="/catalog"
+              to="/#catalog"
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-neon-cyan text-slate-950 font-bold text-lg hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.5)] flex items-center justify-center space-x-2"
             >
               <span>Explore Products</span>

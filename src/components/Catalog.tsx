@@ -56,7 +56,7 @@ export function Catalog() {
     : products.filter(p => p.category === activeCategory);
 
   return (
-    <div className="w-full">
+    <div id="catalog" className="w-full">
       <div className="bg-slate-900 border-b border-white/10 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div>

@@ -10,13 +10,13 @@ export function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-6">Shop Menu</h3>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li><Link to="/catalog" state={{ category: 'Refrigerators' }} className="hover:text-neon-cyan transition-colors">Refrigerators</Link></li>
-              <li><Link to="/catalog" state={{ category: 'Air Conditioners' }} className="hover:text-neon-cyan transition-colors">Air Conditioners</Link></li>
-              <li><Link to="/catalog" state={{ category: 'LED TVs' }} className="hover:text-neon-cyan transition-colors">LED TVs</Link></li>
-              <li><Link to="/catalog" state={{ category: 'Washing Machines' }} className="hover:text-neon-cyan transition-colors">Washing Machines</Link></li>
-              <li><Link to="/catalog" state={{ category: 'Air Coolers' }} className="hover:text-neon-cyan transition-colors">Air Coolers</Link></li>
-              <li><Link to="/catalog" state={{ category: 'Ceiling Fans' }} className="hover:text-neon-cyan transition-colors">Fans</Link></li>
-              <li><Link to="/catalog" state={{ category: 'Kitchen Appliances' }} className="hover:text-neon-cyan transition-colors">Kitchen Appliances</Link></li>
+              <li><Link to="/#catalog" state={{ category: 'Refrigerators' }} className="hover:text-neon-cyan transition-colors">Refrigerators</Link></li>
+              <li><Link to="/#catalog" state={{ category: 'Air Conditioners' }} className="hover:text-neon-cyan transition-colors">Air Conditioners</Link></li>
+              <li><Link to="/#catalog" state={{ category: 'LED TVs' }} className="hover:text-neon-cyan transition-colors">LED TVs</Link></li>
+              <li><Link to="/#catalog" state={{ category: 'Washing Machines' }} className="hover:text-neon-cyan transition-colors">Washing Machines</Link></li>
+              <li><Link to="/#catalog" state={{ category: 'Air Coolers' }} className="hover:text-neon-cyan transition-colors">Air Coolers</Link></li>
+              <li><Link to="/#catalog" state={{ category: 'Ceiling Fans' }} className="hover:text-neon-cyan transition-colors">Fans</Link></li>
+              <li><Link to="/#catalog" state={{ category: 'Kitchen Appliances' }} className="hover:text-neon-cyan transition-colors">Kitchen Appliances</Link></li>
             </ul>
           </div>
 
