@@ -5,10 +5,9 @@ import { ProductCard } from "../components/ProductCard";
 import { ProductModal } from "../components/ProductModal";
 import { ProductFormModal } from "../components/ProductFormModal";
 import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "../utils/cn";
 import { SlidersHorizontal, ChevronDown, Plus } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const CATEGORIES: ('All' | Category)[] = ['All', ...CATEGORY_LIST];
 
