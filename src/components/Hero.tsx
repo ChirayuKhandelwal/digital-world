@@ -30,17 +30,17 @@ export function Hero() {
           animate="visible"
           className="text-center max-w-4xl mx-auto"
         >
+          <motion.h1 
+            variants={itemVariants} 
+            className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-6 text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-white to-neon-fuchsia drop-shadow-[0_0_20px_rgba(0,243,255,0.3)] uppercase"
+          >
+            DIGITAL WORLD
+          </motion.h1>
+
           <motion.div variants={itemVariants} className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8">
             <span className="flex h-2 w-2 rounded-full bg-neon-cyan animate-pulse"></span>
             <span className="text-sm font-medium text-slate-300">Trusted Electronics Store & Wholesale Supplier</span>
           </motion.div>
-
-          <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-8 leading-tight">
-            Technology that feels <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-white to-neon-fuchsia">
-              like magic.
-            </span>
-          </motion.h1>
 
           <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
             Digital World brings you the best range of TVs, Refrigerators, Washing Machines, Air Conditioners, Fans, Coolers, Kitchen Appliances, and Electronics from India's leading brands.
