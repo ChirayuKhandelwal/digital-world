@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { LogIn } from 'lucide-react';
+import { LogIn, Chrome } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAppContext();
+  const { login, loginWithGoogle } = useAppContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,6 +80,31 @@ export function Login() {
             </button>
           </div>
         </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-slate-900 text-slate-400">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <button
+              onClick={async () => {
+                const success = await loginWithGoogle();
+                if (success) navigate('/');
+                else setError('Google sign-in failed. Please try again.');
+              }}
+              className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-white/10 rounded-xl text-sm font-medium text-white bg-white/5 hover:bg-white/10 transition-colors"
+            >
+              <Chrome className="w-5 h-5" />
+              Sign in with Google
+            </button>
+          </div>
+        </div>
 
         <div className="text-center mt-4">
           <p className="text-sm text-slate-400">

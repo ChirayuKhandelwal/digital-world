@@ -4,7 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { products as initialProducts, CATEGORY_LIST } from '../data/mockData';
 import { db, auth } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 
 export type Category = typeof CATEGORY_LIST[number];
 
@@ -60,6 +60,7 @@ interface AppContextType {
   currentUser: User | null;
   register: (user: Omit<User, 'id' | 'role' | 'cart'>) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
   
   addToCart: (product: Product) => void;
@@ -264,6 +265,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const loginWithGoogle = async (): Promise<boolean> => {
+    if (auth && db) {
+      try {
+        const provider = new GoogleAuthProvider();
+        const userCredential = await signInWithPopup(auth, provider);
+        const firebaseUser = userCredential.user;
+        const role = firebaseUser.email === 'krishankhandelwal637@gmail.com' ? 'admin' : 'customer';
+        
+        await setDoc(doc(db, 'customers', firebaseUser.uid), {
+          name: firebaseUser.displayName,
+          email: firebaseUser.email,
+          role: role,
+          lastLogin: new Date().toISOString()
+        }, { merge: true });
+        
+        return true;
+      } catch (error) {
+        console.error("Google Auth error:", error);
+        return false;
+      }
+    }
+    return false;
+  };
+
   const logout = async () => {
     if (auth) {
       await signOut(auth);
@@ -385,7 +410,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider value={{
       products, addProduct, updateProduct, deleteProduct,
-      users, currentUser, register, login, logout,
+      users, currentUser, register, login, loginWithGoogle, logout,
       addToCart, removeFromCart, deleteFromCart, cartCount,
       orders, placeOrder
     }}>
