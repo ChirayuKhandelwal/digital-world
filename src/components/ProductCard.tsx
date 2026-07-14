@@ -53,7 +53,7 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
         
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-white">
-            ${product.price.toLocaleString()}
+            ₹{product.price.toLocaleString()}
           </span>
           <div className="flex space-x-2">
             <button 

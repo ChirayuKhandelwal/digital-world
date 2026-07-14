@@ -63,7 +63,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
           <h2 className="text-3xl font-bold text-white mb-4">{product.name}</h2>
           
           <div className="text-2xl font-bold text-white mb-6">
-            ${product.price.toLocaleString()}
+            ₹{product.price.toLocaleString()}
           </div>
           
           <p className="text-slate-300 leading-relaxed mb-8">

@@ -96,7 +96,7 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Price ($)</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Price (₹)</label>
                 <input required type="number" min="0" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon-cyan/50" />
               </div>
             </div>

@@ -55,7 +55,7 @@ export function Cart() {
                 <img src={item.product.image} alt={item.product.name} className="w-24 h-24 object-cover rounded-xl" />
                 <div className="flex-1 text-center sm:text-left">
                   <h3 className="text-lg font-semibold text-white">{item.product.name}</h3>
-                  <p className="text-neon-cyan font-medium">${item.product.price.toLocaleString()}</p>
+                  <p className="text-neon-cyan font-medium">₹{item.product.price.toLocaleString()}</p>
                   
                   <div className="flex items-center gap-4 mt-3 justify-center sm:justify-start">
                     <div className="flex items-center bg-slate-950 rounded-lg border border-white/10 p-1">
@@ -92,7 +92,7 @@ export function Cart() {
             <h2 className="text-2xl font-bold text-white mb-6">Order Summary</h2>
             <div className="flex justify-between items-center mb-4 text-slate-300">
               <span>Subtotal</span>
-              <span>${total.toLocaleString()}</span>
+              <span>₹{total.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center mb-6 text-slate-300">
               <span>Shipping</span>
@@ -100,7 +100,7 @@ export function Cart() {
             </div>
             <div className="flex justify-between items-center mb-8 pb-6 border-b border-white/10 text-xl font-bold text-white">
               <span>Total</span>
-              <span className="text-neon-cyan">${total.toLocaleString()}</span>
+              <span className="text-neon-cyan">₹{total.toLocaleString()}</span>
             </div>
             
             <div className="space-y-4 mb-6">

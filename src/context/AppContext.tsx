@@ -32,10 +32,13 @@ export interface Order {
     name: string;
     email: string;
     phone: string;
+    address?: string;
   };
   items: CartItem[];
   total: number;
   date: string;
+  status: 'Pending' | 'Processing' | 'Delivered';
+  paymentStatus: 'Paid' | 'Pending' | 'COD';
 }
 
 export interface User {
@@ -70,7 +73,9 @@ interface AppContextType {
 
   // Order state
   orders: Order[];
-  placeOrder: (customer: { name: string; email: string; phone: string }) => void;
+  placeOrder: (customer: { name: string; email: string; phone: string; address?: string }) => void;
+  updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
+  deleteOrder: (orderId: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -356,7 +361,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const placeOrder = async (customer: { name: string; email: string; phone: string }) => {
+  const placeOrder = async (customer: { name: string; email: string; phone: string; address?: string }) => {
     console.log("placeOrder triggered with customer:", customer);
     
     if (!currentUser) {
@@ -374,7 +379,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       customer,
       items: [...currentUser.cart],
       total,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      status: 'Pending' as const,
+      paymentStatus: 'Pending' as const
     };
     
     console.log("Constructed order data:", orderData);
@@ -405,6 +412,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => setShowToast(false), 2000);
   };
 
+  const updateOrder = async (orderId: string, updates: Partial<Order>) => {
+    if (db) {
+      try {
+        await updateDoc(doc(db, 'orders', orderId), updates);
+      } catch (error) {
+        console.error("Error updating order:", error);
+      }
+    } else {
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updates } : o));
+    }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'orders', orderId));
+      } catch (error) {
+        console.error("Error deleting order:", error);
+      }
+    } else {
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+    }
+  };
+
   const cartCount = currentUser?.cart.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   return (
@@ -412,7 +443,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       products, addProduct, updateProduct, deleteProduct,
       users, currentUser, register, login, loginWithGoogle, logout,
       addToCart, removeFromCart, deleteFromCart, cartCount,
-      orders, placeOrder
+      orders, placeOrder, updateOrder, deleteOrder
     }}>
       {children}
       <AnimatePresence>
