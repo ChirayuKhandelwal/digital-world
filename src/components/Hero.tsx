@@ -19,11 +19,11 @@ export function Hero() {
   };
 
   return (
-    <div className="relative overflow-hidden pt-20 pb-32 lg:pt-32 lg:pb-48">
+    <div className="relative overflow-hidden w-full max-w-[100vw] pt-20 pb-32 lg:pt-32 lg:pb-48 m-0 box-border">
       {/* Abstract background blobs (additional to Layout for Hero specifically) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[500px] bg-gradient-to-r from-neon-cyan/20 to-neon-fuchsia/20 blur-[100px] -z-10 rounded-full mix-blend-screen opacity-50" />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 box-border m-0 w-full">
         <motion.div
           variants={containerVariants}
           initial="hidden"

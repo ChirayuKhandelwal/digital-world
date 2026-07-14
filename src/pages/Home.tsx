@@ -31,11 +31,11 @@ export function Home() {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-[100vw] overflow-x-hidden m-0 p-0 box-border">
       <Hero />
       
       {/* Main Content Area */}
-      <main className="relative z-10">
+      <main className="relative z-10 w-full max-w-[100vw] overflow-x-hidden m-0 p-0 box-border">
         <FeaturedProducts 
           products={products}
           onQuickView={setSelectedProduct}
