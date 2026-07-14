@@ -22,21 +22,21 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Mobile Nav Toggle & Logo */}
-          <div className="flex items-center space-x-2 md:space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4 min-w-0">
             {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
+              className="md:hidden p-1 sm:p-2 text-slate-400 hover:text-white transition-colors shrink-0"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
             
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 group">
-              <div className="p-1.5 md:p-2 bg-neon-cyan/10 rounded-lg group-hover:bg-neon-cyan/20 transition-colors">
-                <MonitorPlay className="w-5 h-5 md:w-6 md:h-6 text-neon-cyan" />
+            <Link to="/" className="flex items-center space-x-1 sm:space-x-2 group min-w-0">
+              <div className="p-1 sm:p-1.5 md:p-2 bg-neon-cyan/10 rounded-lg group-hover:bg-neon-cyan/20 transition-colors shrink-0">
+                <MonitorPlay className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-neon-cyan" />
               </div>
-              <span className="font-bold text-sm sm:text-base md:text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+              <span className="font-bold text-[11px] sm:text-sm md:text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate">
                 DIGITAL WORLD
               </span>
             </Link>
@@ -90,33 +90,33 @@ export function Navbar() {
           </div>
 
           {/* Mobile Right Actions */}
-          <div className="flex items-center space-x-3 md:hidden">
+          <div className="flex items-center space-x-1 sm:space-x-2 md:hidden shrink-0 ml-2">
             {currentUser ? (
               <>
-                <Link to={currentUser.role === 'admin' ? "/admin" : "/cart"} className="relative p-2 text-slate-400 hover:text-neon-cyan transition-colors">
-                  {currentUser.role === 'admin' ? <User className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5" />}
+                <Link to={currentUser.role === 'admin' ? "/admin" : "/cart"} className="relative p-1.5 sm:p-2 text-slate-400 hover:text-neon-cyan transition-colors">
+                  {currentUser.role === 'admin' ? <User className="w-4 h-4 sm:w-5 sm:h-5" /> : <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />}
                   {currentUser.role !== 'admin' && cartCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-slate-950 bg-neon-cyan rounded-full">
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 py-0.5 text-[8px] sm:text-[10px] font-bold leading-none text-slate-950 bg-neon-cyan rounded-full">
                       {cartCount}
                     </span>
                   )}
                 </Link>
                 <button 
                   onClick={() => { logout(); navigate('/'); }}
-                  className="p-2 text-slate-400 hover:text-white transition-colors"
+                  className="p-1.5 sm:p-2 text-slate-400 hover:text-white transition-colors"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="p-2 text-slate-400 hover:text-neon-cyan transition-colors">
-                  <User className="w-5 h-5" />
+                <Link to="/login" className="p-1.5 sm:p-2 text-slate-400 hover:text-neon-cyan transition-colors">
+                  <User className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
-                <Link to="/cart" className="relative p-2 text-slate-400 hover:text-neon-cyan transition-colors">
-                  <ShoppingCart className="w-5 h-5" />
+                <Link to="/cart" className="relative p-1.5 sm:p-2 text-slate-400 hover:text-neon-cyan transition-colors">
+                  <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-slate-950 bg-neon-cyan rounded-full">
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 py-0.5 text-[8px] sm:text-[10px] font-bold leading-none text-slate-950 bg-neon-cyan rounded-full">
                       {cartCount}
                     </span>
                   )}
@@ -151,43 +151,6 @@ export function Navbar() {
                 >
                   {link.name}
                 </Link>
-              ))}
-              {currentUser ? (
-                <>
-                  {currentUser.role === 'admin' ? (
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2 rounded-md text-base font-medium text-neon-cyan hover:bg-white/5"
-                    >
-                      Admin Dashboard
-                    </Link>
-                  ) : (
-                    <Link
-                      to="/cart"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2 rounded-md text-base font-medium text-neon-cyan hover:bg-white/5 flex justify-between"
-                    >
-                      <span>My Cart</span>
-                      <span className="bg-neon-cyan text-slate-950 px-2 py-0.5 rounded-full text-xs font-bold">{cartCount}</span>
-                    </Link>
-                  )}
-                  <button
-                    onClick={() => { logout(); setIsOpen(false); navigate('/'); }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-400 hover:text-white hover:bg-white/5"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-slate-400 hover:text-white hover:bg-white/5"
-                >
-                  Login / Register
-                </Link>
-              )}
             </div>
           </motion.div>
         )}
