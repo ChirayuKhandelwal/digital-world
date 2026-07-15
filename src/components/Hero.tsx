@@ -39,7 +39,7 @@ export function Hero() {
 
           <motion.div variants={itemVariants} className="inline-flex items-center space-x-2 bg-electric/5 border border-electric/10 rounded-full px-4 py-1.5 mb-8">
             <span className="flex h-2 w-2 rounded-full bg-electric animate-pulse"></span>
-            <span className="text-sm font-medium text-midnight">Trusted Electronics Store & Wholesale Supplier</span>
+            <span className="text-sm font-medium text-midnight">Authorized Distributor of Raj Cooling System, Aroking, ShopZop & Triveni Almirah</span>
           </motion.div>
 
           <motion.p variants={itemVariants} className="text-lg md:text-xl text-coolgrey mb-10 max-w-2xl mx-auto">
