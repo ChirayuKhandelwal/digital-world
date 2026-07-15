@@ -4,19 +4,19 @@ import { db, auth } from '../firebaseAdmin.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Constants
 const OTP_EXPIRY_MINUTES = 5;
 const RATE_LIMIT_MINUTES = 5;
 const MAX_OTP_REQUESTS = 3;
 
-/**
- * Helper to generate a cryptographically secure 6-digit OTP
- */
 const generateOTP = () => {
   return crypto.randomInt(100000, 999999).toString();
 };
 
-export const sendOTP = async (req, res) => {
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   const { email } = req.body;
 
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
@@ -58,8 +58,6 @@ export const sendOTP = async (req, res) => {
       used: false
     });
 
-    // Send email via Resend
-    // Replace 'onboarding@resend.dev' with your verified domain if available
     const { data, error } = await resend.emails.send({
       from: 'Digital World <onboarding@resend.dev>',
       to: [email],
@@ -83,67 +81,6 @@ export const sendOTP = async (req, res) => {
 
   } catch (error) {
     console.error('sendOTP Error:', error);
-    res.status(500).json({ error: 'Internal server error.' });
+    res.status(500).json({ error: 'Internal server error.', details: error.toString() });
   }
-};
-
-export const verifyOTP = async (req, res) => {
-  const { email, code } = req.body;
-
-  if (!email || !code) {
-    return res.status(400).json({ error: 'Email and code are required.' });
-  }
-
-  try {
-    const otpsRef = db.collection('otps');
-    
-    // Find the latest unused OTP for this email
-    const otpsSnapshot = await otpsRef
-      .where('email', '==', email)
-      .where('used', '==', false)
-      .get();
-
-    const docs = otpsSnapshot.docs.sort((a, b) => b.data().createdAt.toDate() - a.data().createdAt.toDate());
-
-    if (docs.length === 0) {
-      return res.status(400).json({ error: 'Invalid or expired OTP.' });
-    }
-
-    const otpDoc = otpsSnapshot.docs[0];
-    const otpData = otpDoc.data();
-
-    // Check expiration
-    if (otpData.expiresAt.toDate() < new Date()) {
-      return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
-    }
-
-    // Check code match
-    if (otpData.code !== code) {
-      return res.status(400).json({ error: 'Incorrect OTP.' });
-    }
-
-    // Mark as used
-    await otpDoc.ref.update({ used: true });
-
-    // Ensure the user exists in Firebase Auth (or create them)
-    let userRecord;
-    try {
-      userRecord = await auth.getUserByEmail(email);
-    } catch (e) {
-      if (e.code === 'auth/user-not-found') {
-        userRecord = await auth.createUser({ email });
-      } else {
-        throw e;
-      }
-    }
-
-    // Generate Firebase Custom Token
-    const customToken = await auth.createCustomToken(userRecord.uid);
-
-    res.status(200).json({ token: customToken });
-
-  } catch (error) {
-    console.error('verifyOTP Error:', error);
-    res.status(500).json({ error: 'Internal server error.' });
-  }
-};
+}
