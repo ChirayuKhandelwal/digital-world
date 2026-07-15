@@ -66,7 +66,7 @@ interface AppContextType {
   loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
   resetPassword: (email: string) => Promise<boolean>;
-  sendOTP: (email: string) => Promise<boolean>;
+  sendOTP: (email: string) => Promise<{ success: boolean; error?: string }>;
   verifyOTP: (email: string, code: string) => Promise<boolean>;
   
   addToCart: (product: Product) => void;
@@ -310,17 +310,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  const sendOTP = async (email: string): Promise<boolean> => {
+  const sendOTP = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
-      return res.ok;
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('sendOTP backend error:', res.status, errorData);
+        return { success: false, error: errorData?.details || errorData?.error || 'Failed to send OTP' };
+      }
+      return { success: true };
     } catch (e) {
       console.error('sendOTP failed', e);
-      return false;
+      return { success: false, error: 'Network error occurred' };
     }
   };
 
@@ -331,12 +336,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code })
       });
-      if (res.ok) {
-        const { token } = await res.json();
-        if (auth) {
-          await signInWithCustomToken(auth, token);
-          return true;
-        }
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('verifyOTP backend error:', res.status, errorData);
+        return false;
+      }
+      const { token } = await res.json();
+      if (auth) {
+        await signInWithCustomToken(auth, token);
+        return true;
       }
       return false;
     } catch (e) {

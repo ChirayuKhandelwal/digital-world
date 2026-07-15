@@ -19,13 +19,13 @@ export function Login() {
     e.preventDefault();
     if (isOtpMode) {
       if (!otpSent) {
-        const success = await sendOTP(email);
+        const { success, error: sendError } = await sendOTP(email);
         if (success) {
           setOtpSent(true);
           setMessage('OTP sent! Please check your email.');
           setError('');
         } else {
-          setError('Failed to send OTP. Please try again or wait a few minutes if rate-limited.');
+          setError(sendError || 'Failed to send OTP. Please try again or wait a few minutes if rate-limited.');
         }
       } else {
         const success = await verifyOTP(email, otpCode);
