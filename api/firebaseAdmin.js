@@ -3,17 +3,16 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// If you have a service account JSON file, you can initialize it like this:
-// import serviceAccount from './serviceAccountKey.json' assert { type: "json" };
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
-
 // Or using env vars:
 if (!admin.apps.length) {
   try {
     if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
-      const privateKey = (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+      let privateKey = process.env.FIREBASE_PRIVATE_KEY || '';
+      // Remove surrounding quotes if accidentally copied
+      privateKey = privateKey.replace(/^"|"$/g, '').replace(/^'|'$/g, '');
+      // Handle escaped newlines
+      privateKey = privateKey.replace(/\\n/g, '\n');
+
       admin.initializeApp({
         credential: admin.credential.cert({
           projectId: process.env.FIREBASE_PROJECT_ID,
@@ -22,8 +21,7 @@ if (!admin.apps.length) {
         })
       });
     } else {
-      console.warn("Initializing Firebase Admin with application default credentials. This may fail if not deployed or without GOOGLE_APPLICATION_CREDENTIALS set.");
-      admin.initializeApp();
+      throw new Error(`Missing Firebase Env Vars! PROJECT_ID: ${!!process.env.FIREBASE_PROJECT_ID}, EMAIL: ${!!process.env.FIREBASE_CLIENT_EMAIL}, KEY: ${!!process.env.FIREBASE_PRIVATE_KEY}`);
     }
   } catch (error) {
     console.error('Firebase Admin Initialization Error:', error);
