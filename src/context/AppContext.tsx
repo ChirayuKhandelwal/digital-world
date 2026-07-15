@@ -4,7 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { products as initialProducts, CATEGORY_LIST } from '../data/mockData';
 import { db, auth } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, sendPasswordResetEmail, signInWithCustomToken } from 'firebase/auth';
 
 export type Category = typeof CATEGORY_LIST[number];
 
@@ -66,6 +66,8 @@ interface AppContextType {
   loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
   resetPassword: (email: string) => Promise<boolean>;
+  sendOTP: (email: string) => Promise<boolean>;
+  verifyOTP: (email: string, code: string) => Promise<boolean>;
   
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -308,6 +310,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const sendOTP = async (email: string): Promise<boolean> => {
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      return res.ok;
+    } catch (e) {
+      console.error('sendOTP failed', e);
+      return false;
+    }
+  };
+
+  const verifyOTP = async (email: string, code: string): Promise<boolean> => {
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code })
+      });
+      if (res.ok) {
+        const { token } = await res.json();
+        if (auth) {
+          await signInWithCustomToken(auth, token);
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      console.error('verifyOTP failed', e);
+      return false;
+    }
+  };
+
   const logout = async () => {
     if (auth) {
       await signOut(auth);
@@ -456,6 +493,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider value={{
       products, addProduct, updateProduct, deleteProduct,
       users, currentUser, register, login, loginWithGoogle, logout, resetPassword,
+      sendOTP, verifyOTP,
       addToCart, removeFromCart, deleteFromCart, cartCount,
       orders, placeOrder, updateOrder, deleteOrder
     }}>

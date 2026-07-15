@@ -7,19 +7,42 @@ import { motion } from 'framer-motion';
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [isOtpMode, setIsOtpMode] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const { login, loginWithGoogle, resetPassword } = useAppContext();
+  const { login, loginWithGoogle, resetPassword, sendOTP, verifyOTP } = useAppContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(email, password);
-    if (success) {
-      navigate('/');
+    if (isOtpMode) {
+      if (!otpSent) {
+        const success = await sendOTP(email);
+        if (success) {
+          setOtpSent(true);
+          setMessage('OTP sent! Please check your email.');
+          setError('');
+        } else {
+          setError('Failed to send OTP. Please try again or wait a few minutes if rate-limited.');
+        }
+      } else {
+        const success = await verifyOTP(email, otpCode);
+        if (success) {
+          navigate('/');
+        } else {
+          setError('Invalid or expired OTP.');
+        }
+      }
     } else {
-      setError('Invalid email or password');
-      setPassword('');
+      const success = await login(email, password);
+      if (success) {
+        navigate('/');
+      } else {
+        setError('Invalid email or password');
+        setPassword('');
+      }
     }
   };
 
@@ -51,42 +74,85 @@ export function Login() {
                 placeholder="admin@digitalworld.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={otpSent}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-coolgrey mb-1">Password</label>
-              <input
-                type="password"
-                required
-                className="appearance-none rounded-xl block w-full px-4 py-3 border border-gray-200 bg-gray-50 text-midnight focus:outline-none focus:ring-2 focus:ring-electric/50 focus:border-electric sm:text-sm transition-all"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <div className="flex items-center justify-end mt-2">
+
+            {!isOtpMode ? (
+              <div>
+                <label className="block text-sm font-medium text-coolgrey mb-1">Password</label>
+                <input
+                  type="password"
+                  required
+                  className="appearance-none rounded-xl block w-full px-4 py-3 border border-gray-200 bg-gray-50 text-midnight focus:outline-none focus:ring-2 focus:ring-electric/50 focus:border-electric sm:text-sm transition-all"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setIsOtpMode(true); setError(''); setMessage(''); }}
+                    className="text-sm font-medium text-coolgrey hover:text-midnight transition-colors"
+                  >
+                    Login with OTP instead
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!email) {
+                        setError('Please enter your email first to reset password');
+                        setMessage('');
+                        return;
+                      }
+                      setError('');
+                      setMessage('');
+                      const success = await resetPassword(email);
+                      if (success) {
+                        setMessage('Password reset email sent. Please check your inbox.');
+                      } else {
+                        setError('Failed to send reset email. Please verify your email address.');
+                      }
+                    }}
+                    className="text-sm font-medium text-electric hover:text-electric/80 transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              </div>
+            ) : otpSent ? (
+              <div>
+                <label className="block text-sm font-medium text-coolgrey mb-1">6-Digit Code</label>
+                <input
+                  type="text"
+                  required
+                  className="appearance-none rounded-xl block w-full px-4 py-3 border border-gray-200 bg-gray-50 text-midnight focus:outline-none focus:ring-2 focus:ring-electric/50 focus:border-electric sm:text-sm transition-all tracking-[0.5em] text-center font-bold text-xl"
+                  placeholder="------"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                />
+                <div className="flex justify-start mt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setIsOtpMode(false); setOtpSent(false); setError(''); setMessage(''); }}
+                    className="text-sm font-medium text-coolgrey hover:text-midnight transition-colors"
+                  >
+                    Back to password login
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-start mt-2">
                 <button
                   type="button"
-                  onClick={async () => {
-                    if (!email) {
-                      setError('Please enter your email first to reset password');
-                      setMessage('');
-                      return;
-                    }
-                    setError('');
-                    setMessage('');
-                    const success = await resetPassword(email);
-                    if (success) {
-                      setMessage('Password reset email sent. Please check your inbox.');
-                    } else {
-                      setError('Failed to send reset email. Please verify your email address.');
-                    }
-                  }}
-                  className="text-sm font-medium text-electric hover:text-electric/80 transition-colors"
+                  onClick={() => { setIsOtpMode(false); setError(''); setMessage(''); }}
+                  className="text-sm font-medium text-coolgrey hover:text-midnight transition-colors"
                 >
-                  Forgot password?
+                  Back to password login
                 </button>
               </div>
-            </div>
+            )}
           </div>
 
           {error && (
@@ -105,7 +171,7 @@ export function Login() {
               type="submit"
               className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-electric hover:bg-electric/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-electric transition-all shadow-md shadow-electric/20"
             >
-              Sign In
+              {isOtpMode ? (otpSent ? 'Verify Code' : 'Send OTP') : 'Sign In'}
             </button>
           </div>
         </form>
