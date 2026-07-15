@@ -15,7 +15,8 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
   const { currentUser, addToCart } = useAppContext();
   const navigate = useNavigate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!currentUser) {
       alert("Please login to add items to your cart.");
       navigate('/login');
@@ -27,11 +28,12 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
   return (
     <motion.div
       layout
+      onClick={() => onQuickView(product)}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       whileHover={{ y: -5 }}
-      className="group relative bg-white shadow-xl shadow-black/5 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-black/10 transition-all duration-300"
+      className="group relative bg-white shadow-xl shadow-black/5 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-black/10 transition-all duration-300 cursor-pointer"
     >
       <div className="aspect-[4/3] overflow-hidden bg-gray-100 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
@@ -56,24 +58,17 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
             ₹{product.price.toLocaleString()}
           </span>
           <div className="flex space-x-1 sm:space-x-2">
-            <button 
-              onClick={() => onQuickView(product)}
-              className="p-1.5 sm:p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors"
-              aria-label="Quick view"
-            >
-              <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
             {currentUser?.role === 'admin' ? (
               <>
                 <button 
-                  onClick={() => onEdit?.(product)}
+                  onClick={(e) => { e.stopPropagation(); onEdit?.(product); }}
                   className="p-1.5 sm:p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-electric transition-colors"
                   aria-label="Edit product"
                 >
                   <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <button 
-                  onClick={() => onDelete?.(product.id)}
+                  onClick={(e) => { e.stopPropagation(); onDelete?.(product.id); }}
                   className="p-1.5 sm:p-2 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors"
                   aria-label="Delete product"
                 >
