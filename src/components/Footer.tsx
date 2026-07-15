@@ -39,7 +39,7 @@ export function Footer() {
               <li className="flex items-start">
                 <MapPin className="w-5 h-5 mr-3 text-electric shrink-0 mt-0.5" />
                 <a 
-                  href="https://www.google.com/maps/search/?api=1&query=Digital+World+Lalsot+Dausa+Raj"
+                  href="https://maps.app.goo.gl/L1ZyZGcNQaZBgCMdA?g_st=ac"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-electric transition-colors"

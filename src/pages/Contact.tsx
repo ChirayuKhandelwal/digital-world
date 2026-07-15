@@ -61,7 +61,7 @@ export function Contact() {
                 <div>
                   <h3 className="text-lg font-bold text-midnight mb-1">Location</h3>
                   <a 
-                    href="https://www.google.com/maps/search/?api=1&query=Digital+World+Lalsot+Dausa+Raj"
+                    href="https://maps.app.goo.gl/L1ZyZGcNQaZBgCMdA?g_st=ac"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-coolgrey hover:text-electric transition-colors block"
