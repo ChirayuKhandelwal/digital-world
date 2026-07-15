@@ -60,7 +60,14 @@ export function Contact() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-midnight mb-1">Location</h3>
-                  <p className="text-coolgrey">Lalsot, Dausa, (Raj.)</p>
+                  <a 
+                    href="https://www.google.com/maps/search/?api=1&query=Digital+World+Lalsot+Dausa+Raj"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-coolgrey hover:text-electric transition-colors block"
+                  >
+                    Lalsot, Dausa, (Raj.)
+                  </a>
                 </div>
               </div>
 
@@ -70,7 +77,11 @@ export function Contact() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-midnight mb-1">Phone</h3>
-                  <p className="text-coolgrey">+91 8946850123</p>
+                  <div className="flex flex-col space-y-1">
+                    <a href="tel:+918946850123" className="text-coolgrey hover:text-electric transition-colors">+91 8946850123</a>
+                    <a href="tel:+917014342766" className="text-coolgrey hover:text-electric transition-colors">+91 7014342766</a>
+                    <a href="tel:+916350628179" className="text-coolgrey hover:text-electric transition-colors">+91 6350628179</a>
+                  </div>
                 </div>
               </div>
 

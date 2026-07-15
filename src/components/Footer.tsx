@@ -37,12 +37,23 @@ export function Footer() {
             <h3 className="text-midnight font-bold mb-6">Contact Information</h3>
             <ul className="space-y-4 text-sm text-coolgrey">
               <li className="flex items-start">
-                <MapPin className="w-5 h-5 mr-3 text-electric shrink-0" />
-                <span>Lalsot, Dausa, (Raj.)</span>
+                <MapPin className="w-5 h-5 mr-3 text-electric shrink-0 mt-0.5" />
+                <a 
+                  href="https://www.google.com/maps/search/?api=1&query=Digital+World+Lalsot+Dausa+Raj"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-electric transition-colors"
+                >
+                  Lalsot, Dausa, (Raj.)
+                </a>
               </li>
               <li className="flex items-start">
-                <Phone className="w-5 h-5 mr-3 text-electric shrink-0" />
-                <span>+91 8946850123</span>
+                <Phone className="w-5 h-5 mr-3 text-electric shrink-0 mt-0.5" />
+                <div className="flex flex-col space-y-1">
+                  <a href="tel:+918946850123" className="hover:text-electric transition-colors">+91 8946850123</a>
+                  <a href="tel:+917014342766" className="hover:text-electric transition-colors">+91 7014342766</a>
+                  <a href="tel:+916350628179" className="hover:text-electric transition-colors">+91 6350628179</a>
+                </div>
               </li>
               <li className="flex items-start">
                 <Mail className="w-5 h-5 mr-3 text-electric shrink-0" />

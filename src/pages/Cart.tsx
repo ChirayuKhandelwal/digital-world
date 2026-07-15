@@ -10,6 +10,7 @@ export function Cart() {
   const [name, setName] = useState(currentUser?.name || "");
   const [email, setEmail] = useState(currentUser?.email || "");
   const [phone, setPhone] = useState(currentUser?.mobile || "");
+  const [address, setAddress] = useState("");
 
   if (!currentUser) {
     return (
@@ -126,19 +127,26 @@ export function Cart() {
                 onChange={e => setPhone(e.target.value)} 
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
               />
+              <textarea 
+                placeholder="Delivery Address" 
+                value={address} 
+                onChange={e => setAddress(e.target.value)} 
+                rows={3}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors resize-none"
+              />
             </div>
 
             <button 
               onClick={() => {
-                if (!name || !email || !phone) {
-                  alert("Please fill in all customer details.");
+                if (!name || !email || !phone || !address) {
+                  alert("Please fill in all customer details including delivery address.");
                   return;
                 }
-                placeOrder({ name, email, phone });
+                placeOrder({ name, email, phone, address });
               }}
               className="w-full py-4 bg-electric text-white font-bold rounded-xl hover:bg-electric/90 transition-all shadow-md shadow-electric/20"
             >
-              Proceed to Checkout
+              Order Now
             </button>
           </div>
         </div>
