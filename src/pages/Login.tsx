@@ -8,7 +8,8 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, loginWithGoogle } = useAppContext();
+  const [message, setMessage] = useState('');
+  const { login, loginWithGoogle, resetPassword } = useAppContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,12 +63,40 @@ export function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <div className="flex items-center justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!email) {
+                      setError('Please enter your email first to reset password');
+                      setMessage('');
+                      return;
+                    }
+                    setError('');
+                    setMessage('');
+                    const success = await resetPassword(email);
+                    if (success) {
+                      setMessage('Password reset email sent. Please check your inbox.');
+                    } else {
+                      setError('Failed to send reset email. Please verify your email address.');
+                    }
+                  }}
+                  className="text-sm font-medium text-electric hover:text-electric/80 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
             </div>
           </div>
 
           {error && (
             <div className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-lg border border-red-100">
               {error}
+            </div>
+          )}
+          {message && (
+            <div className="text-green-600 text-sm text-center bg-green-50 py-2 rounded-lg border border-green-100">
+              {message}
             </div>
           )}
 

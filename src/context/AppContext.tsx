@@ -4,7 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { products as initialProducts, CATEGORY_LIST } from '../data/mockData';
 import { db, auth } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'firebase/auth';
 
 export type Category = typeof CATEGORY_LIST[number];
 
@@ -65,6 +65,7 @@ interface AppContextType {
   login: (email: string, password: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
+  resetPassword: (email: string) => Promise<boolean>;
   
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -288,6 +289,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return true;
       } catch (error) {
         console.error("Google Auth error:", error);
+        return false;
+      }
+    }
+    return false;
+  };
+
+  const resetPassword = async (email: string): Promise<boolean> => {
+    if (auth) {
+      try {
+        await sendPasswordResetEmail(auth, email);
+        return true;
+      } catch (error) {
+        console.error("Password reset error:", error);
         return false;
       }
     }
