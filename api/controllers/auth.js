@@ -30,10 +30,16 @@ export const sendOTP = async (req, res) => {
     const fiveMinutesAgo = new Date(Date.now() - RATE_LIMIT_MINUTES * 60 * 1000);
     const recentOTPsSnapshot = await otpsRef
       .where('email', '==', email)
-      .where('createdAt', '>=', fiveMinutesAgo)
       .get();
 
-    if (recentOTPsSnapshot.size >= MAX_OTP_REQUESTS) {
+    let recentCount = 0;
+    recentOTPsSnapshot.forEach(doc => {
+      if (doc.data().createdAt.toDate() >= fiveMinutesAgo) {
+        recentCount++;
+      }
+    });
+
+    if (recentCount >= MAX_OTP_REQUESTS) {
       return res.status(429).json({ 
         error: `Too many requests. Please wait ${RATE_LIMIT_MINUTES} minutes before requesting another code.` 
       });
@@ -95,11 +101,11 @@ export const verifyOTP = async (req, res) => {
     const otpsSnapshot = await otpsRef
       .where('email', '==', email)
       .where('used', '==', false)
-      .orderBy('createdAt', 'desc')
-      .limit(1)
       .get();
 
-    if (otpsSnapshot.empty) {
+    const docs = otpsSnapshot.docs.sort((a, b) => b.data().createdAt.toDate() - a.data().createdAt.toDate());
+
+    if (docs.length === 0) {
       return res.status(400).json({ error: 'Invalid or expired OTP.' });
     }
 
