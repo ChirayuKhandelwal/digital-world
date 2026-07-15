@@ -47,46 +47,46 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-midnight mb-2">{product.name}</h3>
-        <p className="text-coolgrey text-sm line-clamp-2 mb-4">{product.description}</p>
+      <div className="p-3 sm:p-6">
+        <h3 className="text-base sm:text-xl font-bold text-midnight mb-1 sm:mb-2 line-clamp-1 sm:line-clamp-none">{product.name}</h3>
+        <p className="text-coolgrey text-xs sm:text-sm line-clamp-2 mb-3 sm:mb-4">{product.description}</p>
         
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-midnight">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-base sm:text-2xl font-bold text-midnight">
             ₹{product.price.toLocaleString()}
           </span>
-          <div className="flex space-x-2">
+          <div className="flex space-x-1 sm:space-x-2">
             <button 
               onClick={() => onQuickView(product)}
-              className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors"
+              className="p-1.5 sm:p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors"
               aria-label="Quick view"
             >
-              <Eye className="w-5 h-5" />
+              <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             {currentUser?.role === 'admin' ? (
               <>
                 <button 
                   onClick={() => onEdit?.(product)}
-                  className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-electric transition-colors"
+                  className="p-1.5 sm:p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-coolgrey hover:text-electric transition-colors"
                   aria-label="Edit product"
                 >
-                  <Edit2 className="w-5 h-5" />
+                  <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <button 
                   onClick={() => onDelete?.(product.id)}
-                  className="p-2 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors"
+                  className="p-1.5 sm:p-2 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors"
                   aria-label="Delete product"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </>
             ) : (
               <button 
                 onClick={handleAddToCart}
-                className="p-2 bg-electric text-white hover:bg-electric/90 border border-transparent rounded-lg transition-all shadow-sm hover:shadow-md hover:shadow-electric/20"
+                className="p-1.5 sm:p-2 bg-electric text-white hover:bg-electric/90 border border-transparent rounded-lg transition-all shadow-sm hover:shadow-md hover:shadow-electric/20"
                 aria-label="Add to cart"
               >
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             )}
           </div>
