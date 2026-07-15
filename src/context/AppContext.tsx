@@ -312,7 +312,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const sendOTP = async (email: string): Promise<boolean> => {
     try {
-      const res = await fetch('http://localhost:3001/api/auth/send-otp', {
+      const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -326,7 +326,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const verifyOTP = async (email: string, code: string): Promise<boolean> => {
     try {
-      const res = await fetch('http://localhost:3001/api/auth/verify-otp', {
+      const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code })
