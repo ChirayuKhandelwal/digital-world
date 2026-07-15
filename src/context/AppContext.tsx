@@ -455,7 +455,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider value={{
       products, addProduct, updateProduct, deleteProduct,
-      users, currentUser, register, login, loginWithGoogle, logout,
+      users, currentUser, register, login, loginWithGoogle, logout, resetPassword,
       addToCart, removeFromCart, deleteFromCart, cartCount,
       orders, placeOrder, updateOrder, deleteOrder
     }}>
