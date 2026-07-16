@@ -19,7 +19,7 @@ export interface Product {
   specs: string[];
   featured?: boolean;
 }
-export type Role = 'customer' | 'admin';
+export type Role = 'owner' | 'admin' | 'staff' | 'customer';
 
 export interface CartItem {
   product: Product;
@@ -250,12 +250,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           }
         }
         
+        let role: Role = 'customer';
+        if (firebaseUser.email === 'krishankhandelwal637@gmail.com') {
+          role = 'owner';
+        } else if (userData.role) {
+          role = userData.role as Role;
+        }
+
         setCurrentUser({
           id: firebaseUser.uid,
           name: userData.name || 'User',
           email: firebaseUser.email || '',
           mobile: userData.mobile || '',
-          role: firebaseUser.email === 'krishankhandelwal637@gmail.com' ? 'admin' : 'customer',
+          address: userData.address || '',
+          role: role,
           cart: userData.cart || []
         });
       } else {
@@ -270,7 +278,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password || '');
         const firebaseUser = userCredential.user;
-        const role = userData.email === 'krishankhandelwal637@gmail.com' ? 'admin' : 'customer';
+        const role = userData.email === 'krishankhandelwal637@gmail.com' ? 'owner' : 'customer';
         
         await setDoc(doc(db, 'customers', firebaseUser.uid), {
           name: userData.name,
@@ -316,7 +324,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const provider = new GoogleAuthProvider();
         const userCredential = await signInWithPopup(auth, provider);
         const firebaseUser = userCredential.user;
-        const role = firebaseUser.email === 'krishankhandelwal637@gmail.com' ? 'admin' : 'customer';
+        const role = firebaseUser.email === 'krishankhandelwal637@gmail.com' ? 'owner' : 'customer';
         
         await setDoc(doc(db, 'customers', firebaseUser.uid), {
           name: firebaseUser.displayName,

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, Download, Search, Calendar, Filter, Tag, Settings, Save } from 'lucide-react';
+import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, Download, Search, Calendar, Filter, Tag, Settings, Save, Shield } from 'lucide-react';
 import type { Product, Order, Coupon, DiscountSettings } from '../context/AppContext';
 import { ProductFormModal } from '../components/ProductFormModal';
 import { CouponFormModal } from '../components/CouponFormModal';
@@ -11,6 +11,7 @@ import { showAlert } from '../utils/alert';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { auth } from '../lib/firebase';
 
 export function AdminDashboard() {
   const { currentUser, products, addProduct, updateProduct, deleteProduct, orders, updateOrder, deleteOrder, coupons, addCoupon, updateCoupon, deleteCoupon, discountSettings, updateDiscountSettings } = useAppContext();
@@ -18,11 +19,14 @@ export function AdminDashboard() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'coupons'>('orders');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'coupons' | 'users'>('orders');
 
   // Coupon State
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+
+  // Users State
+  const [allUsers, setAllUsers] = useState<any[]>([]);
 
   // Discount Settings State
   const [localSettings, setLocalSettings] = useState<DiscountSettings>({ advance_multiplier: 1, partial_multiplier: 1, cod_multiplier: 1 });
@@ -31,6 +35,60 @@ export function AdminDashboard() {
     if (discountSettings) setLocalSettings(discountSettings);
   }, [discountSettings]);
 
+  useEffect(() => {
+    if (activeTab === 'users' && currentUser?.role === 'owner') {
+      fetchUsers();
+    }
+  }, [activeTab, currentUser]);
+
+  const fetchUsers = async () => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+
+      const res = await fetch('/api/get-users', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAllUsers(data.users || []);
+      } else {
+        showAlert.error("Error", "Failed to fetch users");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+
+      const res = await fetch('/api/update-user-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ targetUserId: userId, newRole })
+      });
+
+      if (res.ok) {
+        showAlert.success("Success", "User role updated successfully");
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        showAlert.error("Error", data.error || "Failed to update role");
+      }
+    } catch (error) {
+      console.error(error);
+      showAlert.error("Error", "Network error updating role");
+    }
+  };
+
   // Orders State
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('');
@@ -38,12 +96,12 @@ export function AdminDashboard() {
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!currentUser || currentUser.role !== 'admin') {
+    if (!currentUser || !['owner', 'admin', 'staff'].includes(currentUser.role)) {
       navigate('/');
     }
   }, [currentUser, navigate]);
 
-  if (!currentUser || currentUser.role !== 'admin') return null;
+  if (!currentUser || !['owner', 'admin', 'staff'].includes(currentUser.role)) return null;
 
   // Product Handlers
   const handleAddNew = () => {
@@ -161,9 +219,13 @@ export function AdminDashboard() {
 
   const handleSendOTP = async (orderId: string) => {
     try {
+      const token = await auth.currentUser?.getIdToken();
       const res = await fetch('/api/generate-delivery-otp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify({ orderId })
       });
       const data = await res.json();
@@ -187,25 +249,38 @@ export function AdminDashboard() {
         </div>
         
         <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200 w-full md:w-auto overflow-x-auto shrink-0">
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'products' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
-          >
-            Products
-          </button>
+          {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'products' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
+            >
+              Products
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('orders')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
           >
             Orders
           </button>
-          <button
-            onClick={() => setActiveTab('coupons')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === 'coupons' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
-          >
-            <Tag className="w-4 h-4" />
-            Coupons
-          </button>
+          {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
+            <button
+              onClick={() => setActiveTab('coupons')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === 'coupons' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
+            >
+              <Tag className="w-4 h-4" />
+              Coupons
+            </button>
+          )}
+          {currentUser.role === 'owner' && (
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === 'users' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
+            >
+              <Settings className="w-4 h-4" />
+              User Management
+            </button>
+          )}
         </div>
 
         {activeTab === 'products' && (
@@ -619,6 +694,64 @@ export function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'users' && currentUser.role === 'owner' && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/5 overflow-hidden">
+          <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-midnight">User Management</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-coolgrey uppercase bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 font-bold">User</th>
+                  <th className="px-6 py-4 font-bold">Email</th>
+                  <th className="px-6 py-4 font-bold">Current Role</th>
+                  <th className="px-6 py-4 font-bold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {allUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-midnight">
+                      {user.name}
+                    </td>
+                    <td className="px-6 py-4 text-coolgrey">{user.email}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        user.role === 'owner' ? 'bg-purple-100 text-purple-700' :
+                        user.role === 'admin' ? 'bg-blue-100 text-blue-700' :
+                        user.role === 'staff' ? 'bg-orange-100 text-orange-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {user.role.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                        disabled={user.role === 'owner'}
+                        className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-midnight focus:border-electric focus:ring-1 focus:ring-electric/50 disabled:opacity-50"
+                      >
+                        {user.role === 'owner' && <option value="owner">Owner</option>}
+                        <option value="admin">Admin</option>
+                        <option value="staff">Staff</option>
+                        <option value="customer">Customer</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+                {allUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-12 text-center text-gray-400">Loading users...</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

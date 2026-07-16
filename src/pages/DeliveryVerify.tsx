@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PackageOpen, KeyRound, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { auth } from '../lib/firebase';
 
 export function DeliveryVerify() {
   const [orderId, setOrderId] = useState('');
@@ -16,9 +17,13 @@ export function DeliveryVerify() {
     setMessage('');
 
     try {
+      const token = await auth.currentUser?.getIdToken();
       const res = await fetch('/api/verify-delivery-otp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify({ orderId, otp })
       });
       const data = await res.json();

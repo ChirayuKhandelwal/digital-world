@@ -1,10 +1,11 @@
 import { db } from './firebaseAdmin.js';
 import { Resend } from 'resend';
 import crypto from 'crypto';
+import { withRole } from './auth/middleware.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -24,36 +25,33 @@ export default async function handler(req, res) {
 
     const orderData = orderDoc.data();
     
-    // Generate secure 6-digit OTP
+    // Generate 6-digit OTP
     const otp = crypto.randomInt(100000, 999999).toString();
-    const expiry = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours from now
+    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 mins expiry
 
     // Save to Firestore
     await orderRef.update({
       deliveryOtp: otp,
-      otpExpiry: expiry.toISOString()
+      otpExpiry: otpExpiry
     });
 
-    // Send Email via Resend
+    // Send via Resend
     const customerEmail = orderData.customer?.email;
-    if (customerEmail) {
-      await resend.emails.send({
-        from: 'Digital World Delivery <onboarding@resend.dev>',
-        to: [customerEmail],
-        subject: `Your Delivery OTP for Order #${orderId}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h2 style="color: #0F172A;">Digital World Delivery</h2>
-            <p>Your order is out for delivery! Please provide the following OTP to our delivery partner to securely receive your package.</p>
-            <div style="background-color: #F8FAFC; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
-              <h1 style="color: #6366F1; letter-spacing: 5px; margin: 0; font-size: 32px;">${otp}</h1>
-            </div>
-            <p style="color: #64748B; font-size: 14px;">This OTP will expire in 2 hours.</p>
-            <p style="color: #64748B; font-size: 14px;">Do not share this code with anyone until you have received your package.</p>
-          </div>
-        `
-      });
+    if (!customerEmail) {
+      return res.status(400).json({ error: 'Customer email not found on order' });
     }
+
+    await resend.emails.send({
+      from: 'Digital World <onboarding@resend.dev>',
+      to: customerEmail,
+      subject: `Your Delivery OTP for Order #${orderId}`,
+      html: `
+        <h2>Your Delivery OTP</h2>
+        <p>Please share this OTP with our delivery partner to securely receive your order.</p>
+        <h1 style="letter-spacing: 5px; color: #6366F1;">${otp}</h1>
+        <p>This code is valid for 15 minutes.</p>
+      `
+    });
 
     return res.status(200).json({ success: true, message: 'OTP generated and sent successfully' });
   } catch (error) {
@@ -61,3 +59,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+export default withRole(['owner', 'admin', 'staff'], handler);
