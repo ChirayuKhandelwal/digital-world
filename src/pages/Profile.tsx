@@ -219,7 +219,6 @@ export function Profile() {
           </div>
         )}
       </div>
-      </div>
 
       <AnimatePresence>
         {isEditing && (
