@@ -11,7 +11,7 @@ export function Cart() {
   const [name, setName] = useState(currentUser?.name || "");
   const [email, setEmail] = useState(currentUser?.email || "");
   const [phone, setPhone] = useState(currentUser?.mobile || "");
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(currentUser?.address || "");
 
   const [paymentMode, setPaymentMode] = useState<"Advance" | "Partial" | "COD">("Advance");
   const [couponCodeInput, setCouponCodeInput] = useState("");

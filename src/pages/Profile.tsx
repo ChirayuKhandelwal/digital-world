@@ -1,10 +1,39 @@
 import { useAppContext } from "../context/AppContext";
 import { Link } from "react-router-dom";
-import { Package, Clock, Truck, CheckCircle2, ShoppingBag, User as UserIcon, Mail, Phone, LogOut } from "lucide-react";
-import { motion } from "framer-motion";
+import { Package, Clock, Truck, CheckCircle2, ShoppingBag, User as UserIcon, Mail, Phone, LogOut, Edit2, MapPin, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { showAlert } from "../utils/alert";
 
 export function Profile() {
-  const { currentUser, orders, logout } = useAppContext();
+  const { currentUser, orders, logout, updateUserProfile } = useAppContext();
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    mobile: '',
+    address: ''
+  });
+
+  const handleEditClick = () => {
+    setEditForm({
+      name: currentUser?.name || '',
+      mobile: currentUser?.mobile || '',
+      address: currentUser?.address || ''
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await updateUserProfile(editForm);
+    if (success) {
+      showAlert.success("Success", "Profile updated successfully!");
+      setIsEditing(false);
+    } else {
+      showAlert.error("Error", "Failed to update profile. Please try again.");
+    }
+  };
 
   if (!currentUser) {
     return (
@@ -51,22 +80,35 @@ export function Profile() {
           <h1 className="text-4xl font-bold text-midnight">My Profile</h1>
         </div>
         
-        <div className="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl shadow-black/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-6">
-            <div className="w-24 h-24 bg-electric/10 rounded-full flex items-center justify-center text-electric text-3xl font-bold">
+        <div className="bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-xl shadow-black/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+          <button 
+            onClick={handleEditClick}
+            className="absolute top-4 right-4 p-2 text-coolgrey hover:text-electric hover:bg-electric/10 rounded-xl transition-colors"
+          >
+            <Edit2 className="w-5 h-5" />
+          </button>
+          
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 w-full md:w-auto">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-electric/10 rounded-full flex items-center justify-center text-electric text-3xl font-bold shrink-0">
               {currentUser.name.charAt(0).toUpperCase()}
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-midnight mb-2">{currentUser.name}</h2>
-              <div className="space-y-1 text-coolgrey font-medium">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  {currentUser.email}
+            <div className="flex-1 min-w-0 w-full">
+              <h2 className="text-2xl font-bold text-midnight mb-3 truncate">{currentUser.name}</h2>
+              <div className="space-y-2 text-coolgrey font-medium text-sm md:text-base">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 shrink-0 text-electric/70" />
+                  <span className="truncate">{currentUser.email}</span>
                 </div>
                 {currentUser.mobile && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    {currentUser.mobile}
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-4 h-4 shrink-0 text-electric/70" />
+                    <span className="truncate">{currentUser.mobile}</span>
+                  </div>
+                )}
+                {currentUser.address && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-4 h-4 shrink-0 text-electric/70 mt-1" />
+                    <span className="break-words line-clamp-2">{currentUser.address}</span>
                   </div>
                 )}
               </div>
@@ -78,9 +120,9 @@ export function Profile() {
               logout();
               window.location.href = '/';
             }}
-            className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-xl font-bold transition-colors w-full md:w-auto justify-center"
+            className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-xl font-bold transition-colors w-full md:w-auto justify-center mt-4 md:mt-0 shrink-0"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5 shrink-0" />
             Logout
           </button>
         </div>
@@ -177,6 +219,78 @@ export function Profile() {
           </div>
         )}
       </div>
+      </div>
+
+      <AnimatePresence>
+        {isEditing && (
+          <div className="fixed inset-0 bg-midnight/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl relative"
+            >
+              <button 
+                onClick={() => setIsEditing(false)}
+                className="absolute top-4 right-4 p-2 text-coolgrey hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <h3 className="text-2xl font-bold text-midnight mb-6">Edit Profile</h3>
+              
+              <form onSubmit={handleSaveProfile} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-coolgrey mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.name}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-coolgrey mb-1">Mobile Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={editForm.mobile}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, mobile: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-coolgrey mb-1">Address</label>
+                  <textarea
+                    rows={3}
+                    value={editForm.address}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="Enter your delivery address..."
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors resize-none"
+                  />
+                </div>
+                
+                <div className="pt-4 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="flex-1 px-6 py-3 bg-gray-100 text-midnight font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-6 py-3 bg-electric text-white font-bold rounded-xl hover:bg-electric/90 transition-colors shadow-md shadow-electric/20"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

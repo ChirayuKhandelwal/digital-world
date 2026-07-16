@@ -67,6 +67,7 @@ export interface User {
   name: string;
   email: string;
   mobile: string;
+  address?: string;
   password?: string;
   role: Role;
   cart: CartItem[];
@@ -82,11 +83,12 @@ interface AppContextType {
   // Auth state
   users: User[];
   currentUser: User | null;
-  register: (user: Omit<User, 'id' | 'role' | 'cart'>) => Promise<boolean>;
+  register: (userData: Omit<User, 'id' | 'role' | 'cart'>) => Promise<{ success: boolean; error?: string }>;
   login: (email: string, password: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
   resetPassword: (email: string) => Promise<boolean>;
+  updateUserProfile: (updates: Partial<User>) => Promise<boolean>;
   sendOTP: (email: string) => Promise<{ success: boolean; error?: string }>;
   verifyOTP: (email: string, code: string) => Promise<boolean>;
   
@@ -345,6 +347,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const updateUserProfile = async (updates: Partial<User>): Promise<boolean> => {
+    if (db && currentUser) {
+      try {
+        await setDoc(doc(db, 'customers', currentUser.id), updates, { merge: true });
+        setCurrentUser(prev => prev ? { ...prev, ...updates } : null);
+        return true;
+      } catch (error) {
+        console.error("Update profile error:", error);
+        return false;
+      }
+    }
+    return false;
+  };
+
   const sendOTP = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await fetch('/api/auth/send-otp', {
@@ -587,7 +603,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider value={{
       products, addProduct, updateProduct, deleteProduct,
-      users, currentUser, register, login, loginWithGoogle, logout, resetPassword,
+      users, currentUser, register, login, loginWithGoogle, logout, resetPassword, updateUserProfile,
       sendOTP, verifyOTP,
       addToCart, removeFromCart, deleteFromCart, cartCount,
       orders, placeOrder, updateOrder, deleteOrder,
