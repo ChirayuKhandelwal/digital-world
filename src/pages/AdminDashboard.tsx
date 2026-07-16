@@ -11,7 +11,8 @@ import { showAlert } from '../utils/alert';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { auth } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 export function AdminDashboard() {
   const { currentUser, products, addProduct, updateProduct, deleteProduct, orders, updateOrder, deleteOrder, coupons, addCoupon, updateCoupon, deleteCoupon, discountSettings, updateDiscountSettings } = useAppContext();
@@ -30,10 +31,67 @@ export function AdminDashboard() {
 
   // Discount Settings State
   const [localSettings, setLocalSettings] = useState<DiscountSettings>({ advance_multiplier: 1, partial_multiplier: 1, cod_multiplier: 1 });
+  const [localPercentages, setLocalPercentages] = useState({ advance: 0, partial: 0, cod: 0 });
 
   useEffect(() => {
-    if (discountSettings) setLocalSettings(discountSettings);
+    if (discountSettings) {
+      setLocalSettings(discountSettings);
+      setLocalPercentages({
+        advance: Number(((1 - discountSettings.advance_multiplier) * 100).toFixed(2)),
+        partial: Number(((1 - discountSettings.partial_multiplier) * 100).toFixed(2)),
+        cod: Number(((discountSettings.cod_multiplier - 1) * 100).toFixed(2)),
+      });
+    }
   }, [discountSettings]);
+
+  const handleSaveDiscountSettings = () => {
+    const updatedSettings: DiscountSettings = {
+      advance_multiplier: 1 - (localPercentages.advance / 100),
+      partial_multiplier: 1 - (localPercentages.partial / 100),
+      cod_multiplier: 1 + (localPercentages.cod / 100),
+    };
+    updateDiscountSettings(updatedSettings);
+  };
+
+  // Feedbacks State
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (activeTab === 'feedbacks') {
+      fetchFeedbacks();
+    }
+  }, [activeTab]);
+
+  const fetchFeedbacks = async () => {
+    try {
+      if (!db) return;
+      const q = query(collection(db, 'messages'), orderBy('timestamp', 'desc'));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setFeedbacks(data);
+    } catch (e) {
+      console.error(e);
+      showAlert.error("Error", "Failed to load feedbacks");
+    }
+  };
+
+  // Product Analytics Computation
+  const productAnalytics = React.useMemo(() => {
+    return products.map(product => {
+      let totalSold = 0;
+      let totalRevenue = 0;
+      orders.forEach(order => {
+        if (order.status !== 'Cancelled') {
+          const item = order.items.find(i => i.product.id === product.id);
+          if (item) {
+            totalSold += item.quantity;
+            totalRevenue += (item.product.price * item.quantity);
+          }
+        }
+      });
+      return { ...product, totalSold, totalRevenue };
+    }).sort((a, b) => b.totalSold - a.totalSold);
+  }, [products, orders]);
 
   useEffect(() => {
     if (activeTab === 'users' && currentUser?.role === 'owner') {
@@ -643,36 +701,36 @@ export function AdminDashboard() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Advance Multiplier (e.g. 0.9 for 10% off)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Advance Discount (%)</label>
                 <input
-                  type="number" step="0.01" min="0" max="1"
-                  value={localSettings.advance_multiplier}
-                  onChange={e => setLocalSettings(prev => ({ ...prev, advance_multiplier: parseFloat(e.target.value) }))}
+                  type="number" step="0.1" min="0" max="100"
+                  value={localPercentages.advance}
+                  onChange={e => setLocalPercentages(prev => ({ ...prev, advance: parseFloat(e.target.value) || 0 }))}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Partial Multiplier</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Partial Discount (%)</label>
                 <input
-                  type="number" step="0.01" min="0" max="1"
-                  value={localSettings.partial_multiplier}
-                  onChange={e => setLocalSettings(prev => ({ ...prev, partial_multiplier: parseFloat(e.target.value) }))}
+                  type="number" step="0.1" min="0" max="100"
+                  value={localPercentages.partial}
+                  onChange={e => setLocalPercentages(prev => ({ ...prev, partial: parseFloat(e.target.value) || 0 }))}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">COD Multiplier</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">COD Surcharge (%)</label>
                 <input
-                  type="number" step="0.01" min="0" max="1"
-                  value={localSettings.cod_multiplier}
-                  onChange={e => setLocalSettings(prev => ({ ...prev, cod_multiplier: parseFloat(e.target.value) }))}
+                  type="number" step="0.1" min="0" max="100"
+                  value={localPercentages.cod}
+                  onChange={e => setLocalPercentages(prev => ({ ...prev, cod: parseFloat(e.target.value) || 0 }))}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
                 />
               </div>
             </div>
             <div className="mt-6 flex justify-end">
               <button 
-                onClick={() => updateDiscountSettings(localSettings)}
+                onClick={handleSaveDiscountSettings}
                 className="flex items-center gap-2 bg-midnight text-white px-6 py-2 rounded-xl font-bold hover:bg-midnight/90 shadow-md shadow-black/20 transition-all"
               >
                 <Save className="w-4 h-4" /> Save Settings
@@ -803,26 +861,88 @@ export function AdminDashboard() {
         </div>
       )}
       {activeTab === 'analytics' && (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/5 text-center px-4">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
-            <TrendingUp className="w-10 h-10 text-gray-400" />
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/5 overflow-hidden">
+          <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-midnight flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-electric" />
+              Product Sales Analytics
+            </h2>
           </div>
-          <h2 className="text-2xl font-bold text-midnight mb-3">Analytics & Stats</h2>
-          <p className="text-gray-500 max-w-md mx-auto">
-            Detailed sales performance, revenue tracking, and store analytics are coming soon.
-          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-coolgrey uppercase bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 font-bold">Product</th>
+                  <th className="px-6 py-4 font-bold text-center">Units Sold</th>
+                  <th className="px-6 py-4 font-bold text-right">Total Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {productAnalytics.map((product) => (
+                  <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 font-bold text-midnight flex items-center space-x-3">
+                      <img src={product.image} alt={product.name} className="w-10 h-10 rounded object-cover border border-gray-200" />
+                      <span>{product.name}</span>
+                    </td>
+                    <td className="px-6 py-4 text-center font-medium">
+                      <span className="px-3 py-1 bg-electric/10 text-electric rounded-full">{product.totalSold}</span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-green-600">
+                      ₹{product.totalRevenue.toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+                {productAnalytics.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-12 text-center text-gray-400">No analytics data available yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'feedbacks' && (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/5 text-center px-4">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
-            <Mail className="w-10 h-10 text-gray-400" />
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/5 overflow-hidden">
+          <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-midnight flex items-center gap-2">
+              <Mail className="w-5 h-5 text-electric" />
+              Customer Feedbacks
+            </h2>
           </div>
-          <h2 className="text-2xl font-bold text-midnight mb-3">Customer Feedbacks</h2>
-          <p className="text-gray-500 max-w-md mx-auto">
-            Direct customer messages, product reviews, and feedback management will appear here.
-          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-coolgrey uppercase bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 font-bold">Date</th>
+                  <th className="px-6 py-4 font-bold">Customer</th>
+                  <th className="px-6 py-4 font-bold">Message</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {feedbacks.map((msg) => (
+                  <tr key={msg.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 text-coolgrey whitespace-nowrap">
+                      {new Date(msg.timestamp).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-midnight">{msg.name}</div>
+                      <div className="text-xs text-coolgrey">{msg.email}</div>
+                    </td>
+                    <td className="px-6 py-4 text-midnight">
+                      <p className="bg-gray-50 p-3 rounded-lg border border-gray-100 whitespace-pre-wrap">{msg.message}</p>
+                    </td>
+                  </tr>
+                ))}
+                {feedbacks.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-12 text-center text-gray-400">No feedbacks received yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
