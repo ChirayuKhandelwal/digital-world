@@ -455,7 +455,7 @@ export function AdminDashboard() {
                 <th scope="col" className="px-6 py-4">Product Name</th>
                 <th scope="col" className="px-6 py-4">Category</th>
                 <th scope="col" className="px-6 py-4">Price</th>
-                <th scope="col" className="px-6 py-4">Featured</th>
+                <th scope="col" className="px-6 py-4">Out of Stock</th>
                 <th scope="col" className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -469,10 +469,10 @@ export function AdminDashboard() {
                   <td className="px-6 py-4">{product.category}</td>
                   <td className="px-6 py-4 font-medium text-electric">₹{product.price.toLocaleString()}</td>
                   <td className="px-6 py-4">
-                    {product.featured ? (
-                      <span className="px-2 py-1 bg-electric/10 text-electric rounded text-xs font-bold border border-electric/20">Yes</span>
+                    {product.outOfStock ? (
+                      <span className="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-bold border border-red-200">Yes</span>
                     ) : (
-                      <span className="px-2 py-1 bg-gray-100 text-coolgrey rounded text-xs font-medium border border-gray-200">No</span>
+                      <span className="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-medium border border-green-200">No</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
