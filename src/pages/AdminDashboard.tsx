@@ -40,7 +40,7 @@ export function AdminDashboard() {
       setLocalPercentages({
         advance: Number(((1 - discountSettings.advance_multiplier) * 100).toFixed(2)),
         partial: Number(((1 - discountSettings.partial_multiplier) * 100).toFixed(2)),
-        cod: Number(((discountSettings.cod_multiplier - 1) * 100).toFixed(2)),
+        cod: Number(((1 - discountSettings.cod_multiplier) * 100).toFixed(2)),
       });
     }
   }, [discountSettings]);
@@ -49,7 +49,7 @@ export function AdminDashboard() {
     const updatedSettings: DiscountSettings = {
       advance_multiplier: 1 - (localPercentages.advance / 100),
       partial_multiplier: 1 - (localPercentages.partial / 100),
-      cod_multiplier: 1 + (localPercentages.cod / 100),
+      cod_multiplier: 1 - (localPercentages.cod / 100),
     };
     updateDiscountSettings(updatedSettings);
   };
@@ -783,7 +783,7 @@ export function AdminDashboard() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">COD Surcharge (%)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">COD Discount (%)</label>
                 <input
                   type="number" step="0.1" min="0" max="100"
                   value={localPercentages.cod}

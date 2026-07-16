@@ -211,8 +211,8 @@ export function Cart() {
                     {discountSettings && mode === 'Partial' && discountSettings.partial_multiplier < 1 && (
                       <span className="block text-xs font-bold mt-1 text-green-500">Save {((1 - discountSettings.partial_multiplier) * 100).toFixed(0)}%</span>
                     )}
-                    {discountSettings && mode === 'COD' && discountSettings.cod_multiplier > 1 && (
-                      <span className="block text-xs font-bold mt-1 text-red-500">+Fee</span>
+                    {discountSettings && mode === 'COD' && discountSettings.cod_multiplier < 1 && (
+                      <span className="block text-xs font-bold mt-1 text-green-500">Save {((1 - discountSettings.cod_multiplier) * 100).toFixed(0)}%</span>
                     )}
                   </button>
                 ))}
