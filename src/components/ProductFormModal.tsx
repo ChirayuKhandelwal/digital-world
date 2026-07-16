@@ -20,7 +20,7 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
     description: '',
     image: '',
     specs: '',
-    featured: false
+    outOfStock: false
   });
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
         description: product.description,
         image: product.image,
         specs: product.specs.join('\n'),
-        featured: product.featured || false
+        outOfStock: product.outOfStock || false
       });
     }
   }, [product]);
@@ -48,7 +48,7 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
       description: formData.description,
       image: formData.image,
       specs: formData.specs.split('\n').filter(s => s.trim() !== ''),
-      featured: formData.featured
+      outOfStock: formData.outOfStock
     };
     onSave(submitData);
   };
@@ -117,8 +117,8 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
             </div>
 
             <div className="flex items-center mt-2">
-              <input type="checkbox" id="featured" checked={formData.featured} onChange={e => setFormData({...formData, featured: e.target.checked})} className="mr-2" />
-              <label htmlFor="featured" className="text-sm font-medium text-coolgrey">Featured Product</label>
+              <input type="checkbox" id="outOfStock" checked={formData.outOfStock} onChange={e => setFormData({...formData, outOfStock: e.target.checked})} className="mr-2" />
+              <label htmlFor="outOfStock" className="text-sm font-medium text-coolgrey">Out of Stock</label>
             </div>
           </form>
         </div>

@@ -43,10 +43,15 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
           alt={product.name}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
         />
-        <div className="absolute bottom-4 left-4 z-20">
+        <div className="absolute bottom-4 left-4 z-20 flex gap-2">
           <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-medium text-white border border-white/30">
             {product.category}
           </span>
+          {product.outOfStock && (
+            <span className="px-3 py-1 bg-red-500/80 backdrop-blur-md rounded-full text-xs font-medium text-white border border-red-500/50">
+              Out of Stock
+            </span>
+          )}
         </div>
       </div>
 
@@ -79,7 +84,8 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
             ) : (
               <button 
                 onClick={handleAddToCart}
-                className="p-1.5 sm:p-2 bg-electric text-white hover:bg-electric/90 border border-transparent rounded-lg transition-all shadow-sm hover:shadow-md hover:shadow-electric/20"
+                disabled={product.outOfStock}
+                className={`p-1.5 sm:p-2 bg-electric hover:bg-electric/90 text-white rounded-lg shadow-md shadow-electric/20 transition-all ${product.outOfStock ? 'opacity-50 cursor-not-allowed hover:bg-electric' : ''}`}
                 aria-label="Add to cart"
               >
                 <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />

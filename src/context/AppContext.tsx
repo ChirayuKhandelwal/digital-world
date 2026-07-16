@@ -18,6 +18,7 @@ export interface Product {
   image: string;
   specs: string[];
   featured?: boolean;
+  outOfStock?: boolean;
 }
 export type Role = 'owner' | 'admin' | 'staff' | 'customer';
 

@@ -98,10 +98,11 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                 addToCart(product);
                 onClose();
               }}
-              className="w-full bg-electric text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 hover:bg-electric/90 shadow-md shadow-electric/20 transition-all"
+              disabled={product.outOfStock}
+              className={`w-full bg-electric text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 hover:bg-electric/90 shadow-md shadow-electric/20 transition-all ${product.outOfStock ? 'opacity-50 cursor-not-allowed hover:bg-electric' : ''}`}
             >
               <ShoppingBag className="w-5 h-5" />
-              <span>Add to Cart</span>
+              <span>{product.outOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
             </button>
           </div>
         </div>
