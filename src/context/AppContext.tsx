@@ -16,6 +16,7 @@ export interface Product {
   price: number;
   description: string;
   image: string;
+  images?: string[];
   specs: string[];
   featured?: boolean;
   outOfStock?: boolean;

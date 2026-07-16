@@ -1,7 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { Product } from "../context/AppContext";
-import { X, CheckCircle2, ShoppingBag } from "lucide-react";
-import { useEffect } from "react";
+import { X, CheckCircle2, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { showAlert } from "../utils/alert";
@@ -14,6 +14,19 @@ interface ProductModalProps {
 export function ProductModal({ product, onClose }: ProductModalProps) {
   const { currentUser, addToCart } = useAppContext();
   const navigate = useNavigate();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const allImages = [product.image, ...(product.images || [])];
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
 
   // Prevent scrolling when modal is open
   useEffect(() => {
@@ -51,12 +64,46 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
         </button>
 
         {/* Image Section */}
-        <div className="md:w-1/2 relative bg-gray-100 h-64 md:h-auto shrink-0">
-          <img 
-            src={product.image} 
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+        <div className="md:w-1/2 relative bg-gray-100 h-64 md:h-auto shrink-0 group">
+          <AnimatePresence mode="wait">
+            <motion.img 
+              key={currentImageIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              src={allImages[currentImageIndex]} 
+              alt={`${product.name} - view ${currentImageIndex + 1}`}
+              className="w-full h-full object-cover absolute inset-0"
+            />
+          </AnimatePresence>
+          
+          {allImages.length > 1 && (
+            <>
+              <button 
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white backdrop-blur-md rounded-full text-midnight shadow-lg opacity-0 group-hover:opacity-100 transition-all z-10"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white backdrop-blur-md rounded-full text-midnight shadow-lg opacity-0 group-hover:opacity-100 transition-all z-10"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                {allImages.map((_, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setCurrentImageIndex(i)}
+                    className={`h-1.5 rounded-full transition-all ${currentImageIndex === i ? 'w-4 bg-electric' : 'w-1.5 bg-gray-300 hover:bg-gray-400'}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent md:bg-gradient-to-r" />
         </div>
 

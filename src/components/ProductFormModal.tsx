@@ -19,6 +19,7 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
     price: '',
     description: '',
     image: '',
+    images: '',
     specs: '',
     outOfStock: false
   });
@@ -31,6 +32,7 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
         price: product.price.toString(),
         description: product.description,
         image: product.image,
+        images: product.images ? product.images.join('\n') : '',
         specs: product.specs.join('\n'),
         outOfStock: product.outOfStock || false
       });
@@ -47,6 +49,7 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
       price: Number(formData.price),
       description: formData.description,
       image: formData.image,
+      images: formData.images.split('\n').filter(s => s.trim() !== ''),
       specs: formData.specs.split('\n').filter(s => s.trim() !== ''),
       outOfStock: formData.outOfStock
     };
@@ -107,8 +110,13 @@ export function ProductFormModal({ product, onClose, onSave }: ProductFormModalP
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-coolgrey mb-1">Image URL (GitHub Raw Link)</label>
+              <label className="block text-sm font-medium text-coolgrey mb-1">Image URL (Primary)</label>
               <input required type="url" placeholder="https://raw.githubusercontent.com/..." value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-midnight focus:outline-none focus:border-electric focus:ring-2 focus:ring-electric/50" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-coolgrey mb-1">Additional Image URLs (1 per line)</label>
+              <textarea rows={3} value={formData.images} onChange={e => setFormData({...formData, images: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-midnight focus:outline-none focus:border-electric focus:ring-2 focus:ring-electric/50" placeholder="https://...&#10;https://..." />
             </div>
 
             <div>
