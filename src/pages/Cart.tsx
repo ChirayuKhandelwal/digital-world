@@ -329,7 +329,7 @@ export function Cart() {
                   paymentMode,
                   pricing.final_total,
                   {
-                    discountApplied: appliedCoupon?.code,
+                    ...(appliedCoupon?.code ? { discountApplied: appliedCoupon.code } : {}),
                     discountAmount: pricing.coupon_discount,
                     paymentModeDiscount: pricing.payment_discount
                   }
