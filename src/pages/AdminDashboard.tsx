@@ -20,6 +20,7 @@ export function AdminDashboard() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productSearch, setProductSearch] = useState("");
   const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'orders' | 'users' | 'feedbacks' | 'coupons'>('orders');
 
   // Coupon State
@@ -436,7 +437,19 @@ export function AdminDashboard() {
       {(activeTab === 'products' || activeTab === 'orders') && (
         <div className="space-y-4">
           {activeTab === 'products' && (
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center gap-4 flex-wrap">
+              <div className="relative w-full sm:w-72">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="w-4 h-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={productSearch}
+                  onChange={(e) => setProductSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-electric/50"
+                />
+              </div>
               <button 
                 onClick={handleAddNew}
                 className="flex items-center space-x-2 bg-electric text-white px-4 py-2 rounded-xl font-bold hover:bg-electric/90 shadow-md shadow-electric/20 transition-all shrink-0"
@@ -460,7 +473,7 @@ export function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
+              {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).map((product) => (
                 <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 font-bold text-midnight flex items-center space-x-3">
                     <img src={product.image} alt={product.name} className="w-10 h-10 rounded object-cover border border-gray-200" />
@@ -493,7 +506,7 @@ export function AdminDashboard() {
                   </td>
                 </tr>
               ))}
-              {products.length === 0 && (
+              {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
                     No products found. Add some to get started.

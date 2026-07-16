@@ -5,7 +5,7 @@ import { ProductCard } from "../components/ProductCard";
 import { ProductModal } from "../components/ProductModal";
 import { ProductFormModal } from "../components/ProductFormModal";
 import { AnimatePresence, motion } from "framer-motion";
-import { SlidersHorizontal, ChevronDown, Plus } from "lucide-react";
+import { SlidersHorizontal, ChevronDown, Plus, Search } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import { useLocation } from "react-router-dom";
 
@@ -15,6 +15,7 @@ export function Catalog() {
   const { products, updateProduct, deleteProduct, addProduct, currentUser } = useAppContext();
   const location = useLocation();
   const [activeCategory, setActiveCategory] = useState<'All' | Category>('All');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -51,9 +52,11 @@ export function Catalog() {
     setIsEditModalOpen(false);
   };
 
-  const filteredProducts = activeCategory === 'All' 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
+  const filteredProducts = products.filter(p => {
+    const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div id="catalog" className="w-full">
@@ -77,6 +80,18 @@ export function Catalog() {
                 <span>Add Product</span>
               </button>
             )}
+            <div className="flex items-center relative w-full sm:w-64 shrink-0">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="w-5 h-5 text-coolgrey" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 hover:border-gray-300 rounded-xl text-midnight font-medium focus:outline-none focus:ring-2 focus:ring-electric/50 transition-all shadow-sm"
+              />
+            </div>
             <div className="flex items-center relative w-full sm:w-72 shrink-0">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <SlidersHorizontal className="w-5 h-5 text-electric" />
