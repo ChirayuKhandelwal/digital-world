@@ -303,7 +303,7 @@ export function AdminDashboard() {
       <div className="flex flex-col items-center mb-12 relative">
         <h1 className="text-4xl md:text-5xl font-serif text-[#4A5D53] tracking-tight mb-2">Admin Management Panel</h1>
         <p className="text-xs md:text-sm font-bold text-gray-400 tracking-[0.2em] uppercase text-center mb-8">
-          TRACK SALES PERFORMANCE AND CURATE BOUTIQUE CATALOG INVENTORY
+          TRACK SALES PERFORMANCE AND CURATE BOUTIQUE PRODUCT INVENTORY
         </p>
 
         {/* Tab Navigation - Minimalist Style with Underline */}
