@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, Download, Search, Calendar, Filter, Tag, Settings, Save, Shield } from 'lucide-react';
+import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, Download, Search, Calendar, Filter, Tag, Settings, Save, Shield, TrendingUp, Layers, ShoppingBag, Users, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product, Order, Coupon, DiscountSettings } from '../context/AppContext';
 import { ProductFormModal } from '../components/ProductFormModal';
 import { CouponFormModal } from '../components/CouponFormModal';
@@ -19,7 +19,7 @@ export function AdminDashboard() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'coupons' | 'users'>('orders');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'orders' | 'users' | 'feedbacks' | 'coupons'>('orders');
 
   // Coupon State
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
@@ -242,57 +242,88 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-midnight">Admin Dashboard</h1>
-          <p className="text-coolgrey mt-1">Manage DIGITAL WORLD inventory and orders</p>
+      <div className="flex flex-col items-center mb-12 relative">
+        <h1 className="text-4xl md:text-5xl font-serif text-[#4A5D53] tracking-tight mb-2">Admin Management Panel</h1>
+        <p className="text-xs md:text-sm font-bold text-gray-400 tracking-[0.2em] uppercase text-center mb-8">
+          TRACK SALES PERFORMANCE AND CURATE BOUTIQUE CATALOG INVENTORY
+        </p>
+
+        {/* Tab Navigation - Minimalist Style with Underline */}
+        <div className="w-full relative flex items-center justify-center">
+          <div className="flex overflow-x-auto gap-8 pb-4 scrollbar-hide snap-x">
+            
+            {/* Analytics Stats (Placeholder) */}
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'analytics' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+            >
+              <TrendingUp className="w-5 h-5 mb-1" />
+              <span className="text-xs font-bold tracking-wider uppercase">Analytics<br/>Stats</span>
+            </button>
+
+            {/* Curate Inventory (Products) */}
+            {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'products' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              >
+                <Layers className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold tracking-wider uppercase">Curate<br/>Inventory</span>
+              </button>
+            )}
+
+            {/* Manage Orders (Orders) */}
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'orders' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+            >
+              <ShoppingBag className="w-5 h-5 mb-1" />
+              <span className="text-xs font-bold tracking-wider uppercase">Manage<br/>Orders</span>
+            </button>
+
+            {/* Customers List (Users) */}
+            {currentUser.role === 'owner' && (
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'users' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              >
+                <Users className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold tracking-wider uppercase">Customers<br/>List</span>
+              </button>
+            )}
+
+            {/* Feedbacks (Placeholder) */}
+            <button
+              onClick={() => setActiveTab('feedbacks')}
+              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'feedbacks' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+            >
+              <Mail className="w-5 h-5 mb-1" />
+              <span className="text-xs font-bold tracking-wider uppercase">Feedbacks</span>
+            </button>
+
+            {/* Promo Coupons (Coupons) */}
+            {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
+              <button
+                onClick={() => setActiveTab('coupons')}
+                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'coupons' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              >
+                <Tag className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold tracking-wider uppercase">Promo<br/>Coupons</span>
+              </button>
+            )}
+
+          </div>
+          
+          <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 pointer-events-none flex justify-between hidden md:flex opacity-0">
+             {/* Decorational layout items if needed, omitting since tabs are centered */}
+          </div>
         </div>
         
-        <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200 w-full md:w-auto overflow-x-auto shrink-0">
-          {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'products' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
-            >
-              Products
-            </button>
-          )}
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
-          >
-            Orders
-          </button>
-          {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
-            <button
-              onClick={() => setActiveTab('coupons')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === 'coupons' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
-            >
-              <Tag className="w-4 h-4" />
-              Coupons
-            </button>
-          )}
-          {currentUser.role === 'owner' && (
-            <button
-              onClick={() => setActiveTab('users')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === 'users' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
-            >
-              <Settings className="w-4 h-4" />
-              User Management
-            </button>
-          )}
-        </div>
-
-        {activeTab === 'products' && (
-          <button 
-            onClick={handleAddNew}
-            className="flex items-center space-x-2 bg-electric text-white px-4 py-2 rounded-xl font-bold hover:bg-electric/90 shadow-md shadow-electric/20 transition-all shrink-0"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Add New Product</span>
-          </button>
-        )}
+        {/* Horizontal Divider Line mimicking the screenshot */}
+        <div className="w-full h-px bg-gray-200 mt-0"></div>
       </div>
+
+
 
       {activeTab === 'orders' && (
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between">
@@ -345,9 +376,21 @@ export function AdminDashboard() {
       )}
 
       {(activeTab === 'products' || activeTab === 'orders') && (
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-black/5">
+        <div className="space-y-4">
           {activeTab === 'products' && (
-            <div className="overflow-x-auto">
+            <div className="flex justify-end">
+              <button 
+                onClick={handleAddNew}
+                className="flex items-center space-x-2 bg-electric text-white px-4 py-2 rounded-xl font-bold hover:bg-electric/90 shadow-md shadow-electric/20 transition-all shrink-0"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Add New Product</span>
+              </button>
+            </div>
+          )}
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-black/5">
+            {activeTab === 'products' && (
+              <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-coolgrey">
             <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
               <tr>
@@ -587,6 +630,7 @@ export function AdminDashboard() {
           </div>
         )}
       </div>
+      </div>
       )}
 
       {activeTab === 'coupons' && (
@@ -756,6 +800,29 @@ export function AdminDashboard() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+      {activeTab === 'analytics' && (
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/5 text-center px-4">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
+            <TrendingUp className="w-10 h-10 text-gray-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-midnight mb-3">Analytics & Stats</h2>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Detailed sales performance, revenue tracking, and store analytics are coming soon.
+          </p>
+        </div>
+      )}
+
+      {activeTab === 'feedbacks' && (
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/5 text-center px-4">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
+            <Mail className="w-10 h-10 text-gray-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-midnight mb-3">Customer Feedbacks</h2>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Direct customer messages, product reviews, and feedback management will appear here.
+          </p>
         </div>
       )}
 
