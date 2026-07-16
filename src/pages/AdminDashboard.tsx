@@ -45,13 +45,19 @@ export function AdminDashboard() {
     }
   }, [discountSettings]);
 
-  const handleSaveDiscountSettings = () => {
-    const updatedSettings: DiscountSettings = {
-      advance_multiplier: 1 - (localPercentages.advance / 100),
-      partial_multiplier: 1 - (localPercentages.partial / 100),
-      cod_multiplier: 1 - (localPercentages.cod / 100),
-    };
-    updateDiscountSettings(updatedSettings);
+  const handleSaveDiscountSettings = async () => {
+    try {
+      const updatedSettings: DiscountSettings = {
+        advance_multiplier: 1 - (localPercentages.advance / 100),
+        partial_multiplier: 1 - (localPercentages.partial / 100),
+        cod_multiplier: 1 - (localPercentages.cod / 100),
+      };
+      await updateDiscountSettings(updatedSettings);
+      showAlert.success("Success", "Global discount settings saved successfully!");
+    } catch (e) {
+      console.error(e);
+      showAlert.error("Error", "Failed to save discount settings");
+    }
   };
 
   // Feedbacks State
