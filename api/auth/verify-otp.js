@@ -54,6 +54,18 @@ export default async function handler(req, res) {
       }
     }
 
+    // Ensure the user exists in the customers collection
+    const customerRef = db.collection('customers').doc(userRecord.uid);
+    const customerDoc = await customerRef.get();
+    if (!customerDoc.exists) {
+      await customerRef.set({
+        email: email,
+        name: email.split('@')[0], // default name
+        role: 'customer',
+        createdAt: new Date()
+      });
+    }
+
     // Generate Firebase Custom Token
     const customToken = await auth.createCustomToken(userRecord.uid);
 
