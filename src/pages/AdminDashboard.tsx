@@ -344,9 +344,10 @@ export function AdminDashboard() {
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-black/5">
-        {activeTab === 'products' ? (
-          <div className="overflow-x-auto">
+      {(activeTab === 'products' || activeTab === 'orders') && (
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-black/5">
+          {activeTab === 'products' && (
+            <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-coolgrey">
             <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
               <tr>
@@ -401,7 +402,8 @@ export function AdminDashboard() {
             </tbody>
           </table>
         </div>
-        ) : (
+        )}
+        {activeTab === 'orders' && (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-coolgrey whitespace-nowrap">
               <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
@@ -585,6 +587,7 @@ export function AdminDashboard() {
           </div>
         )}
       </div>
+      )}
 
       {activeTab === 'coupons' && (
         <div className="space-y-8">
