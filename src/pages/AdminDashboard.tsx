@@ -2,21 +2,33 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, Download, Search, Calendar, Filter } from 'lucide-react';
-import type { Product, Order } from '../context/AppContext';
+import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, Download, Search, Calendar, Filter, Tag, Settings, Save } from 'lucide-react';
+import type { Product, Order, Coupon, DiscountSettings } from '../context/AppContext';
 import { ProductFormModal } from '../components/ProductFormModal';
+import { CouponFormModal } from '../components/CouponFormModal';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export function AdminDashboard() {
-  const { currentUser, products, addProduct, updateProduct, deleteProduct, orders, updateOrder, deleteOrder } = useAppContext();
+  const { currentUser, products, addProduct, updateProduct, deleteProduct, orders, updateOrder, deleteOrder, coupons, addCoupon, updateCoupon, deleteCoupon, discountSettings, updateDiscountSettings } = useAppContext();
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders'>('orders');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'coupons'>('orders');
+
+  // Coupon State
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+
+  // Discount Settings State
+  const [localSettings, setLocalSettings] = useState<DiscountSettings>({ advance_multiplier: 1, partial_multiplier: 1, cod_multiplier: 1 });
+
+  useEffect(() => {
+    if (discountSettings) setLocalSettings(discountSettings);
+  }, [discountSettings]);
 
   // Orders State
   const [searchQuery, setSearchQuery] = useState('');
@@ -166,6 +178,13 @@ export function AdminDashboard() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
           >
             Orders
+          </button>
+          <button
+            onClick={() => setActiveTab('coupons')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === 'coupons' ? 'bg-white text-midnight shadow-sm' : 'text-coolgrey hover:text-midnight'}`}
+          >
+            <Tag className="w-4 h-4" />
+            Coupons
           </button>
         </div>
 
@@ -440,12 +459,135 @@ export function AdminDashboard() {
         )}
       </div>
 
+      {activeTab === 'coupons' && (
+        <div className="space-y-8">
+          {/* Discount Settings Section */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xl shadow-black/5">
+            <h2 className="text-xl font-bold text-midnight mb-6 flex items-center gap-2">
+              <Settings className="w-5 h-5 text-electric" />
+              Global Discount Settings
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Advance Multiplier (e.g. 0.9 for 10% off)</label>
+                <input
+                  type="number" step="0.01" min="0" max="1"
+                  value={localSettings.advance_multiplier}
+                  onChange={e => setLocalSettings(prev => ({ ...prev, advance_multiplier: parseFloat(e.target.value) }))}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Partial Multiplier</label>
+                <input
+                  type="number" step="0.01" min="0" max="1"
+                  value={localSettings.partial_multiplier}
+                  onChange={e => setLocalSettings(prev => ({ ...prev, partial_multiplier: parseFloat(e.target.value) }))}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">COD Multiplier</label>
+                <input
+                  type="number" step="0.01" min="0" max="1"
+                  value={localSettings.cod_multiplier}
+                  onChange={e => setLocalSettings(prev => ({ ...prev, cod_multiplier: parseFloat(e.target.value) }))}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button 
+                onClick={() => updateDiscountSettings(localSettings)}
+                className="flex items-center gap-2 bg-midnight text-white px-6 py-2 rounded-xl font-bold hover:bg-midnight/90 shadow-md shadow-black/20 transition-all"
+              >
+                <Save className="w-4 h-4" /> Save Settings
+              </button>
+            </div>
+          </div>
+
+          {/* Coupons Table Section */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xl shadow-black/5">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-midnight flex items-center gap-2">
+                <Tag className="w-5 h-5 text-electric" />
+                Manual Coupons
+              </h2>
+              <button 
+                onClick={() => { setEditingCoupon(null); setIsCouponModalOpen(true); }}
+                className="flex items-center space-x-2 bg-electric text-white px-4 py-2 rounded-xl font-bold hover:bg-electric/90 shadow-md shadow-electric/20 transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create Coupon</span>
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-coolgrey">
+                <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4">Code</th>
+                    <th className="px-6 py-4">Discount %</th>
+                    <th className="px-6 py-4">Allowed Customers</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {coupons.map(coupon => (
+                    <tr key={coupon.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 font-bold text-midnight">{coupon.code}</td>
+                      <td className="px-6 py-4">{coupon.discount_percentage}%</td>
+                      <td className="px-6 py-4">{coupon.allowed_customer_ids.length > 0 ? coupon.allowed_customer_ids.join(', ') : 'Everyone'}</td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${coupon.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {coupon.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right space-x-2">
+                        <button 
+                          onClick={() => { setEditingCoupon(coupon); setIsCouponModalOpen(true); }}
+                          className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => window.confirm("Delete this coupon?") && deleteCoupon(coupon.id)}
+                          className="p-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {coupons.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-12 text-center text-gray-400">No coupons created yet.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AnimatePresence>
         {isModalOpen && (
           <ProductFormModal 
             product={editingProduct} 
             onClose={() => setIsModalOpen(false)}
             onSave={handleSave}
+          />
+        )}
+        {isCouponModalOpen && (
+          <CouponFormModal
+            coupon={editingCoupon}
+            onClose={() => setIsCouponModalOpen(false)}
+            onSave={(data) => {
+              if (editingCoupon) updateCoupon(data as Coupon);
+              else addCoupon(data);
+              setIsCouponModalOpen(false);
+            }}
           />
         )}
       </AnimatePresence>

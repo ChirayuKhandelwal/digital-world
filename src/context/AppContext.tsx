@@ -39,6 +39,21 @@ export interface Order {
   date: string;
   status: 'Pending' | 'Processing' | 'Delivered';
   paymentStatus: 'Paid' | 'Pending' | 'COD';
+  paymentMode?: 'Advance' | 'Partial' | 'COD';
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discount_percentage: number;
+  allowed_customer_ids: string[];
+  is_active: boolean;
+}
+
+export interface DiscountSettings {
+  advance_multiplier: number;
+  partial_multiplier: number;
+  cod_multiplier: number;
 }
 
 export interface User {
@@ -76,9 +91,18 @@ interface AppContextType {
 
   // Order state
   orders: Order[];
-  placeOrder: (customer: { name: string; email: string; phone: string; address?: string }) => void;
+  placeOrder: (customer: { name: string; email: string; phone: string; address?: string }, paymentMode?: string, finalTotal?: number) => void;
   updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
   deleteOrder: (orderId: string) => Promise<void>;
+
+  // Coupons & Discounts
+  coupons: Coupon[];
+  addCoupon: (coupon: Omit<Coupon, 'id'>) => Promise<void>;
+  updateCoupon: (coupon: Coupon) => Promise<void>;
+  deleteCoupon: (id: string) => Promise<void>;
+  
+  discountSettings: DiscountSettings | null;
+  updateDiscountSettings: (settings: DiscountSettings) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -420,7 +444,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const placeOrder = async (customer: { name: string; email: string; phone: string; address?: string }) => {
+  const placeOrder = async (customer: { name: string; email: string; phone: string; address?: string }, paymentMode?: string, finalTotal?: number) => {
     console.log("placeOrder triggered with customer:", customer);
     
     if (!currentUser) {
@@ -432,7 +456,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     
-    const total = currentUser.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+    const cartTotal = currentUser.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+    const total = finalTotal !== undefined ? finalTotal : cartTotal;
+    
     const orderData = {
       userId: currentUser.id,
       customer,
@@ -440,7 +466,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       total,
       date: new Date().toISOString(),
       status: 'Pending' as const,
-      paymentStatus: 'Pending' as const
+      paymentStatus: 'Pending' as const,
+      paymentMode: paymentMode || 'Advance'
     };
     
     console.log("Constructed order data:", orderData);
@@ -495,6 +522,51 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // --- Coupons ---
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  useEffect(() => {
+    if (!db) return;
+    const unsubscribe = onSnapshot(collection(db, 'coupons'), (querySnapshot) => {
+      const fetched: Coupon[] = [];
+      querySnapshot.forEach((doc) => {
+        fetched.push({ ...doc.data(), id: doc.id } as Coupon);
+      });
+      setCoupons(fetched);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const addCoupon = async (couponData: Omit<Coupon, 'id'>) => {
+    if (db) await addDoc(collection(db, 'coupons'), couponData);
+  };
+  const updateCoupon = async (updated: Coupon) => {
+    if (db) {
+      const { id, ...data } = updated;
+      await updateDoc(doc(db, 'coupons', id), data);
+    }
+  };
+  const deleteCoupon = async (id: string) => {
+    if (db) await deleteDoc(doc(db, 'coupons', id));
+  };
+
+  // --- Discount Settings ---
+  const [discountSettings, setDiscountSettings] = useState<DiscountSettings | null>(null);
+  useEffect(() => {
+    if (!db) return;
+    const unsubscribe = onSnapshot(doc(db, 'discount_settings', 'global'), (docSnap) => {
+      if (docSnap.exists()) {
+        setDiscountSettings(docSnap.data() as DiscountSettings);
+      } else {
+        setDiscountSettings({ advance_multiplier: 1, partial_multiplier: 1, cod_multiplier: 1 });
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const updateDiscountSettings = async (settings: DiscountSettings) => {
+    if (db) await setDoc(doc(db, 'discount_settings', 'global'), settings);
+  };
+
   const cartCount = currentUser?.cart.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   return (
@@ -503,7 +575,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       users, currentUser, register, login, loginWithGoogle, logout, resetPassword,
       sendOTP, verifyOTP,
       addToCart, removeFromCart, deleteFromCart, cartCount,
-      orders, placeOrder, updateOrder, deleteOrder
+      orders, placeOrder, updateOrder, deleteOrder,
+      coupons, addCoupon, updateCoupon, deleteCoupon,
+      discountSettings, updateDiscountSettings
     }}>
       {children}
       <AnimatePresence>
