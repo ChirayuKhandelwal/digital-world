@@ -15,6 +15,7 @@ export const showAlert = {
       title,
       text,
       icon: 'success',
+      iconColor: '#6366F1', // electric blue
       buttonsStyling: false,
       confirmButtonText: 'Awesome!',
       showClass: {
@@ -25,7 +26,7 @@ export const showAlert = {
       },
       customClass: {
         ...commonClasses,
-        icon: 'border-0 scale-125 my-6 text-green-500 bg-green-50 rounded-full p-4',
+        icon: 'border-0 scale-125 my-6',
       }
     });
   },
@@ -35,6 +36,7 @@ export const showAlert = {
       title,
       text,
       icon: 'error',
+      iconColor: '#ef4444',
       buttonsStyling: false,
       confirmButtonText: 'Try Again',
       showClass: {
@@ -45,7 +47,7 @@ export const showAlert = {
       },
       customClass: {
         ...commonClasses,
-        icon: 'border-0 scale-125 my-6 text-red-500 bg-red-50 rounded-full p-4',
+        icon: 'border-0 scale-125 my-6',
         confirmButton: 'flex-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl px-6 py-3.5 shadow-lg shadow-red-500/25 transition-all hover:scale-[1.02] active:scale-95',
       }
     });
@@ -56,6 +58,7 @@ export const showAlert = {
       title,
       text,
       icon: 'warning',
+      iconColor: '#f97316',
       buttonsStyling: false,
       confirmButtonText: 'Got it',
       showClass: {
@@ -66,7 +69,7 @@ export const showAlert = {
       },
       customClass: {
         ...commonClasses,
-        icon: 'border-0 scale-125 my-6 text-orange-500 bg-orange-50 rounded-full p-4',
+        icon: 'border-0 scale-125 my-6',
         confirmButton: 'flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl px-6 py-3.5 shadow-lg shadow-orange-500/25 transition-all hover:scale-[1.02] active:scale-95',
       }
     });
