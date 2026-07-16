@@ -1,17 +1,31 @@
 import Swal from 'sweetalert2';
 
+const commonClasses = {
+  popup: 'bg-white/95 backdrop-blur-2xl border border-white/40 rounded-[2rem] shadow-2xl shadow-electric/10 p-2 overflow-hidden',
+  title: 'text-2xl font-black text-midnight tracking-tight pt-4',
+  htmlContainer: 'text-coolgrey font-medium text-sm px-6 pb-4',
+  actions: 'flex gap-3 w-full px-6 pb-6 mt-4',
+  confirmButton: 'flex-1 bg-electric hover:bg-electric/90 text-white font-bold rounded-xl px-6 py-3.5 shadow-lg shadow-electric/25 transition-all hover:scale-[1.02] active:scale-95',
+  cancelButton: 'flex-1 bg-gray-100 hover:bg-gray-200 text-midnight font-bold rounded-xl px-6 py-3.5 transition-all hover:scale-[1.02] active:scale-95 border-0',
+};
+
 export const showAlert = {
   success: (title: string, text?: string) => {
     return Swal.fire({
       title,
       text,
       icon: 'success',
-      confirmButtonColor: '#6366F1', // electric color
-      confirmButtonText: 'OK',
+      buttonsStyling: false,
+      confirmButtonText: 'Awesome!',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
       customClass: {
-        popup: 'rounded-2xl shadow-xl shadow-black/5 border border-gray-100',
-        confirmButton: 'rounded-xl font-bold px-6 py-2 shadow-md shadow-electric/20',
-        title: 'text-midnight font-bold',
+        ...commonClasses,
+        icon: 'border-0 scale-125 my-6 text-green-500 bg-green-50 rounded-full p-4',
       }
     });
   },
@@ -21,12 +35,18 @@ export const showAlert = {
       title,
       text,
       icon: 'error',
-      confirmButtonColor: '#6366F1',
-      confirmButtonText: 'OK',
+      buttonsStyling: false,
+      confirmButtonText: 'Try Again',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutDown animate__faster'
+      },
       customClass: {
-        popup: 'rounded-2xl shadow-xl shadow-black/5 border border-gray-100',
-        confirmButton: 'rounded-xl font-bold px-6 py-2 shadow-md shadow-electric/20',
-        title: 'text-midnight font-bold',
+        ...commonClasses,
+        icon: 'border-0 scale-125 my-6 text-red-500 bg-red-50 rounded-full p-4',
+        confirmButton: 'flex-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl px-6 py-3.5 shadow-lg shadow-red-500/25 transition-all hover:scale-[1.02] active:scale-95',
       }
     });
   },
@@ -36,25 +56,34 @@ export const showAlert = {
       title,
       text,
       icon: 'warning',
-      confirmButtonColor: '#6366F1',
-      confirmButtonText: 'OK',
+      buttonsStyling: false,
+      confirmButtonText: 'Got it',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
       customClass: {
-        popup: 'rounded-2xl shadow-xl shadow-black/5 border border-gray-100',
-        confirmButton: 'rounded-xl font-bold px-6 py-2 shadow-md shadow-electric/20',
-        title: 'text-midnight font-bold',
+        ...commonClasses,
+        icon: 'border-0 scale-125 my-6 text-orange-500 bg-orange-50 rounded-full p-4',
+        confirmButton: 'flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl px-6 py-3.5 shadow-lg shadow-orange-500/25 transition-all hover:scale-[1.02] active:scale-95',
       }
     });
   },
 
   custom: (options: any) => {
     return Swal.fire({
-      confirmButtonColor: '#6366F1',
-      cancelButtonColor: '#E2E8F0',
+      buttonsStyling: false,
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
       customClass: {
-        popup: 'rounded-2xl shadow-xl shadow-black/5 border border-gray-100',
-        confirmButton: 'rounded-xl font-bold px-6 py-2 shadow-md shadow-electric/20',
-        cancelButton: 'rounded-xl font-bold px-6 py-2 text-coolgrey',
-        title: 'text-midnight font-bold',
+        ...commonClasses,
+        ...(options.customClass || {})
       },
       ...options
     });
