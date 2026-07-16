@@ -40,6 +40,9 @@ export interface Order {
   status: 'Pending' | 'Processing' | 'Delivered';
   paymentStatus: 'Paid' | 'Pending' | 'COD';
   paymentMode?: 'Advance' | 'Partial' | 'COD';
+  discountApplied?: string;
+  discountAmount?: number;
+  paymentModeDiscount?: number;
 }
 
 export interface Coupon {
@@ -91,7 +94,12 @@ interface AppContextType {
 
   // Order state
   orders: Order[];
-  placeOrder: (customer: { name: string; email: string; phone: string; address?: string }, paymentMode?: string, finalTotal?: number) => void;
+  placeOrder: (
+    customer: { name: string; email: string; phone: string; address?: string },
+    paymentMode?: string,
+    finalTotal?: number,
+    discountDetails?: { discountApplied?: string; discountAmount?: number; paymentModeDiscount?: number }
+  ) => void;
   updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
   deleteOrder: (orderId: string) => Promise<void>;
 
@@ -444,7 +452,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const placeOrder = async (customer: { name: string; email: string; phone: string; address?: string }, paymentMode?: string, finalTotal?: number) => {
+  const placeOrder = async (
+    customer: { name: string; email: string; phone: string; address?: string },
+    paymentMode?: string,
+    finalTotal?: number,
+    discountDetails?: { discountApplied?: string; discountAmount?: number; paymentModeDiscount?: number }
+  ) => {
     console.log("placeOrder triggered with customer:", customer);
     
     if (!currentUser) {
@@ -467,7 +480,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       date: new Date().toISOString(),
       status: 'Pending' as const,
       paymentStatus: 'Pending' as const,
-      paymentMode: paymentMode || 'Advance'
+      paymentMode: paymentMode || 'Advance',
+      ...discountDetails
     };
     
     console.log("Constructed order data:", orderData);

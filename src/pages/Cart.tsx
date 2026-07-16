@@ -323,7 +323,16 @@ export function Cart() {
                   alert("Please fill in all customer details including delivery address.");
                   return;
                 }
-                placeOrder({ name, email, phone, address }, paymentMode, pricing.final_total);
+                placeOrder(
+                  { name, email, phone, address },
+                  paymentMode,
+                  pricing.final_total,
+                  {
+                    discountApplied: appliedCoupon?.code,
+                    discountAmount: pricing.coupon_discount,
+                    paymentModeDiscount: pricing.payment_discount
+                  }
+                );
               }}
               className="w-full py-4 bg-electric text-white font-bold rounded-xl hover:bg-electric/90 transition-all shadow-md shadow-electric/20"
             >

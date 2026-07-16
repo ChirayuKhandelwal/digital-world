@@ -431,9 +431,29 @@ export function AdminDashboard() {
                                               <td className="px-4 py-3 text-right">₹{(item.product.price * item.quantity).toLocaleString()}</td>
                                             </tr>
                                           ))}
+                                          {order.paymentModeDiscount ? (
+                                            <tr className="bg-gray-50/50">
+                                              <td colSpan={2} className="px-4 py-2 text-right font-medium text-gray-500 border-t border-gray-100">
+                                                Payment Discount ({order.paymentMode})
+                                              </td>
+                                              <td className="px-4 py-2 text-right font-medium text-green-600 border-t border-gray-100">
+                                                {order.paymentModeDiscount > 0 ? '-' : '+'}₹{Math.abs(order.paymentModeDiscount).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                              </td>
+                                            </tr>
+                                          ) : null}
+                                          {order.discountAmount ? (
+                                            <tr className="bg-gray-50/50">
+                                              <td colSpan={2} className="px-4 py-2 text-right font-medium text-gray-500 border-t border-gray-100">
+                                                Coupon Discount {order.discountApplied ? `(${order.discountApplied})` : ''}
+                                              </td>
+                                              <td className="px-4 py-2 text-right font-medium text-green-600 border-t border-gray-100">
+                                                -₹{order.discountAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                              </td>
+                                            </tr>
+                                          ) : null}
                                           <tr className="bg-gray-50">
                                             <td colSpan={2} className="px-4 py-3 text-right font-bold text-midnight rounded-l-lg border-t border-gray-200">Grand Total</td>
-                                            <td className="px-4 py-3 text-right font-bold text-electric rounded-r-lg border-t border-gray-200">₹{order.total.toLocaleString()}</td>
+                                            <td className="px-4 py-3 text-right font-bold text-electric rounded-r-lg border-t border-gray-200">₹{order.total.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                           </tr>
                                         </tbody>
                                       </table>
