@@ -301,8 +301,8 @@ export function AdminDashboard() {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="flex flex-col items-center mb-12 relative">
-        <h1 className="text-4xl md:text-5xl font-serif text-[#4A5D53] tracking-tight mb-2">Admin Management Panel</h1>
-        <p className="text-xs md:text-sm font-bold text-gray-400 tracking-[0.2em] uppercase text-center mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-midnight tracking-tight mb-2">Admin Management Panel</h1>
+        <p className="text-xs md:text-sm font-bold text-coolgrey tracking-[0.2em] uppercase text-center mb-8">
           TRACK SALES PERFORMANCE AND CURATE BOUTIQUE PRODUCT INVENTORY
         </p>
 
@@ -313,7 +313,7 @@ export function AdminDashboard() {
             {/* Analytics Stats (Placeholder) */}
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'analytics' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'analytics' ? 'border-electric text-electric' : 'border-transparent text-coolgrey hover:text-midnight'}`}
             >
               <TrendingUp className="w-5 h-5 mb-1" />
               <span className="text-xs font-bold tracking-wider uppercase">Analytics<br/>Stats</span>
@@ -323,7 +323,7 @@ export function AdminDashboard() {
             {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
               <button
                 onClick={() => setActiveTab('products')}
-                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'products' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'products' ? 'border-electric text-electric' : 'border-transparent text-coolgrey hover:text-midnight'}`}
               >
                 <Layers className="w-5 h-5 mb-1" />
                 <span className="text-xs font-bold tracking-wider uppercase">Curate<br/>Inventory</span>
@@ -333,7 +333,7 @@ export function AdminDashboard() {
             {/* Manage Orders (Orders) */}
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'orders' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'orders' ? 'border-electric text-electric' : 'border-transparent text-coolgrey hover:text-midnight'}`}
             >
               <ShoppingBag className="w-5 h-5 mb-1" />
               <span className="text-xs font-bold tracking-wider uppercase">Manage<br/>Orders</span>
@@ -343,7 +343,7 @@ export function AdminDashboard() {
             {currentUser.role === 'owner' && (
               <button
                 onClick={() => setActiveTab('users')}
-                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'users' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'users' ? 'border-electric text-electric' : 'border-transparent text-coolgrey hover:text-midnight'}`}
               >
                 <Users className="w-5 h-5 mb-1" />
                 <span className="text-xs font-bold tracking-wider uppercase">Customers<br/>List</span>
@@ -353,7 +353,7 @@ export function AdminDashboard() {
             {/* Feedbacks (Placeholder) */}
             <button
               onClick={() => setActiveTab('feedbacks')}
-              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'feedbacks' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'feedbacks' ? 'border-electric text-electric' : 'border-transparent text-coolgrey hover:text-midnight'}`}
             >
               <Mail className="w-5 h-5 mb-1" />
               <span className="text-xs font-bold tracking-wider uppercase">Feedbacks</span>
@@ -363,7 +363,7 @@ export function AdminDashboard() {
             {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
               <button
                 onClick={() => setActiveTab('coupons')}
-                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'coupons' ? 'border-gray-800 text-gray-800' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                className={`flex flex-col items-center justify-center gap-2 min-w-[120px] transition-all border-b-2 pb-3 snap-center ${activeTab === 'coupons' ? 'border-electric text-electric' : 'border-transparent text-coolgrey hover:text-midnight'}`}
               >
                 <Tag className="w-5 h-5 mb-1" />
                 <span className="text-xs font-bold tracking-wider uppercase">Promo<br/>Coupons</span>
