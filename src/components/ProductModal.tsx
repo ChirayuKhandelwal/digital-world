@@ -4,6 +4,7 @@ import { X, CheckCircle2, ShoppingBag } from "lucide-react";
 import { useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import { showAlert } from "../utils/alert";
 
 interface ProductModalProps {
   product: Product;
@@ -90,7 +91,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
             <button 
               onClick={() => {
                 if (!currentUser) {
-                  alert("Please login to add items to your cart.");
+                  showAlert.warning("Login Required", "Please login to add items to your cart.");
                   navigate('/login');
                   return;
                 }

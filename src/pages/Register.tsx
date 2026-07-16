@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { showAlert } from '../utils/alert';
 
 export function Register() {
   const [formData, setFormData] = useState({
@@ -17,11 +18,26 @@ export function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await register(formData);
-    if (success) {
+    const result = await register(formData);
+    if (result.success) {
       navigate('/');
     } else {
-      setError('Registration failed. Please try again.');
+      if (result.error === 'auth/email-already-in-use') {
+        showAlert.custom({
+          title: 'Already Registered!',
+          text: 'An account with this email address already exists.',
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonText: 'Login instead',
+          cancelButtonText: 'Try another email',
+        }).then((res) => {
+          if (res.isConfirmed) {
+            navigate('/login');
+          }
+        });
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     }
   };
 

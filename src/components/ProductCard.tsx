@@ -3,6 +3,7 @@ import type { Product } from "../context/AppContext";
 import { ShoppingCart, Eye, Edit2, Trash2 } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import { showAlert } from "../utils/alert";
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +19,7 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
-      alert("Please login to add items to your cart.");
+      showAlert.warning("Login Required", "Please login to add items to your cart.");
       navigate('/login');
       return;
     }

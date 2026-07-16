@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { db } from "../lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { showAlert } from "../utils/alert";
 
 export function Contact() {
   const { currentUser } = useAppContext();
@@ -27,9 +28,10 @@ export function Contact() {
       });
       setSuccess(true);
       setMessage("");
+      showAlert.success("Message Sent!", "Thank you for reaching out. We will get back to you shortly.");
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Failed to send message. Please try again.");
+      showAlert.error("Failed to send", "Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

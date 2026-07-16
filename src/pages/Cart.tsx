@@ -3,6 +3,7 @@ import { Trash2, ShoppingBag, Plus, Minus, Tag, Calculator } from "lucide-react"
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { showAlert } from "../utils/alert";
 
 export function Cart() {
   const { currentUser, removeFromCart, addToCart, deleteFromCart, placeOrder, discountSettings, coupons } = useAppContext();
@@ -320,7 +321,7 @@ export function Cart() {
             <button 
               onClick={() => {
                 if (!name || !email || !phone || !address) {
-                  alert("Please fill in all customer details including delivery address.");
+                  showAlert.error("Missing Details", "Please fill in all customer details including delivery address.");
                   return;
                 }
                 placeOrder(

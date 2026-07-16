@@ -65,8 +65,8 @@ export function Navbar() {
                   </Link>
                 ) : (
                   <>
-                    <Link to="/my-orders" className="text-sm font-medium text-coolgrey hover:text-electric transition-colors">
-                      My Orders
+                    <Link to="/profile" className="text-sm font-medium text-coolgrey hover:text-electric transition-colors">
+                      Profile
                     </Link>
                     <Link to="/cart" className="relative p-2 text-coolgrey hover:text-electric transition-colors">
                       <ShoppingCart className="w-5 h-5" />
@@ -158,16 +158,16 @@ export function Navbar() {
               ))}
               {currentUser && currentUser.role !== 'admin' && (
                 <Link
-                  to="/my-orders"
+                  to="/profile"
                   onClick={() => setIsOpen(false)}
                   className={cn(
                     "block px-3 py-2 rounded-md text-base font-medium",
-                    location.pathname === '/my-orders'
+                    location.pathname === '/profile'
                       ? "text-electric bg-gray-50"
                       : "text-coolgrey hover:text-midnight hover:bg-gray-50"
                   )}
                 >
-                  My Orders
+                  Profile
                 </Link>
               )}
             </div>

@@ -5,6 +5,7 @@ import { products as initialProducts, CATEGORY_LIST } from '../data/mockData';
 import { db, auth } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, sendPasswordResetEmail, signInWithCustomToken } from 'firebase/auth';
+import { showAlert } from '../utils/alert';
 
 export type Category = typeof CATEGORY_LIST[number];
 
@@ -262,7 +263,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const register = async (userData: Omit<User, 'id' | 'role' | 'cart'>): Promise<boolean> => {
+  const register = async (userData: Omit<User, 'id' | 'role' | 'cart'>): Promise<{ success: boolean; error?: string }> => {
     if (auth && db) {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password || '');
@@ -278,13 +279,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           registeredAt: new Date().toISOString()
         }, { merge: true });
         
-        return true;
-      } catch (error) {
+        return { success: true };
+      } catch (error: any) {
         console.error("Registration error:", error);
-        return false;
+        return { success: false, error: error.code };
       }
     }
-    return false; 
+    return { success: false, error: 'auth/not-initialized' }; 
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -509,9 +510,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setDoc(doc(db, 'customers', updatedUser.id), { cart: [] }, { merge: true }).catch(console.error);
     }
 
-    setToastMessage("Order placed successfully!");
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
+    showAlert.success("Success", "Order placed successfully!");
   };
 
   const updateOrder = async (orderId: string, updates: Partial<Order>) => {

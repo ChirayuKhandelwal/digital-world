@@ -7,6 +7,7 @@ import type { Product, Order, Coupon, DiscountSettings } from '../context/AppCon
 import { ProductFormModal } from '../components/ProductFormModal';
 import { CouponFormModal } from '../components/CouponFormModal';
 import { AnimatePresence, motion } from 'framer-motion';
+import { showAlert } from '../utils/alert';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -125,7 +126,7 @@ export function AdminDashboard() {
       XLSX.writeFile(wb, "Orders_Export.xlsx");
     } catch (e) {
       console.error("Failed to export Excel:", e);
-      alert("Failed to export to Excel. Check console for details.");
+      showAlert.error("Export Failed", "Failed to export to Excel. Check console for details.");
     }
   };
 
@@ -154,7 +155,7 @@ export function AdminDashboard() {
       doc.save("Orders_Export.pdf");
     } catch (e) {
       console.error("Failed to export PDF:", e);
-      alert("Failed to export to PDF. Check console for details.");
+      showAlert.error("Export Failed", "Failed to export to PDF. Check console for details.");
     }
   };
 
@@ -167,13 +168,13 @@ export function AdminDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Delivery OTP sent successfully to the customer's email.");
+        showAlert.success("Success", "Delivery OTP sent successfully to the customer's email.");
       } else {
-        alert(data.error || "Failed to send Delivery OTP");
+        showAlert.error("Error", data.error || "Failed to send Delivery OTP");
       }
     } catch (e) {
       console.error(e);
-      alert("An error occurred while sending OTP.");
+      showAlert.error("Error", "An error occurred while sending OTP.");
     }
   };
 
