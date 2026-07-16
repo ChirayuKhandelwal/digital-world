@@ -64,14 +64,19 @@ export function Navbar() {
                     Dashboard
                   </Link>
                 ) : (
-                  <Link to="/cart" className="relative p-2 text-coolgrey hover:text-electric transition-colors">
-                    <ShoppingCart className="w-5 h-5" />
-                    {cartCount > 0 && (
-                      <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-electric rounded-full">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Link>
+                  <>
+                    <Link to="/my-orders" className="text-sm font-medium text-coolgrey hover:text-electric transition-colors">
+                      My Orders
+                    </Link>
+                    <Link to="/cart" className="relative p-2 text-coolgrey hover:text-electric transition-colors">
+                      <ShoppingCart className="w-5 h-5" />
+                      {cartCount > 0 && (
+                        <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-electric rounded-full">
+                          {cartCount}
+                        </span>
+                      )}
+                    </Link>
+                  </>
                 )}
                 <button 
                   onClick={() => { logout(); navigate('/'); }}
@@ -151,6 +156,20 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              {currentUser && currentUser.role !== 'admin' && (
+                <Link
+                  to="/my-orders"
+                  onClick={() => setIsOpen(false)}
+                  className={cn(
+                    "block px-3 py-2 rounded-md text-base font-medium",
+                    location.pathname === '/my-orders'
+                      ? "text-electric bg-gray-50"
+                      : "text-coolgrey hover:text-midnight hover:bg-gray-50"
+                  )}
+                >
+                  My Orders
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

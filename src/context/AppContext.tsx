@@ -37,9 +37,11 @@ export interface Order {
   items: CartItem[];
   total: number;
   date: string;
-  status: 'Pending' | 'Processing' | 'Delivered';
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Out for Delivery' | 'Delivered';
   paymentStatus: 'Paid' | 'Pending' | 'COD';
   paymentMode?: 'Advance' | 'Partial' | 'COD';
+  deliveryOtp?: string;
+  otpExpiry?: string;
   discountApplied?: string;
   discountAmount?: number;
   paymentModeDiscount?: number;

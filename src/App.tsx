@@ -7,6 +7,8 @@ import { Register } from "./pages/Register";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { Cart } from "./pages/Cart";
 import { Contact } from "./pages/Contact";
+import { MyOrders } from "./pages/MyOrders";
+import { DeliveryVerify } from "./pages/DeliveryVerify";
 import { AppProvider } from "./context/AppContext";
 
 function ScrollToTop() {
@@ -40,7 +42,9 @@ function App() {
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="cart" element={<Cart />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="my-orders" element={<MyOrders />} />
         </Route>
+        <Route path="/delivery-verify" element={<DeliveryVerify />} />
       </Routes>
     </AppProvider>
   );

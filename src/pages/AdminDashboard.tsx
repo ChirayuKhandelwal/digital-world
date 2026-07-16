@@ -158,6 +158,25 @@ export function AdminDashboard() {
     }
   };
 
+  const handleSendOTP = async (orderId: string) => {
+    try {
+      const res = await fetch('/api/generate-delivery-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Delivery OTP sent successfully to the customer's email.");
+      } else {
+        alert(data.error || "Failed to send Delivery OTP");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("An error occurred while sending OTP.");
+    }
+  };
+
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -352,6 +371,8 @@ export function AdminDashboard() {
                           >
                             <option value="Pending">Pending</option>
                             <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Out for Delivery">Out for Delivery</option>
                             <option value="Delivered">Delivered</option>
                           </select>
                         </td>
@@ -399,14 +420,24 @@ export function AdminDashboard() {
                                       <p><span className="text-gray-500">Name:</span> <span className="text-midnight font-medium ml-2">{order.customer?.name}</span></p>
                                       <p><span className="text-gray-500">Email:</span> <span className="text-midnight font-medium ml-2">{order.customer?.email}</span></p>
                                       <p><span className="text-gray-500">Phone:</span> <span className="text-midnight font-medium ml-2">{order.customer?.phone}</span></p>
-                                      {order.customer?.address && (
-                                        <div className="pt-2 mt-2 border-t border-gray-100">
-                                          <span className="text-gray-500 block mb-1">Address:</span>
-                                          <p className="text-midnight bg-gray-50 p-2 rounded border border-gray-100 whitespace-pre-wrap leading-relaxed">{order.customer.address}</p>
-                                        </div>
-                                      )}
+                                        {order.customer?.address && (
+                                          <div className="pt-2 mt-2 border-t border-gray-100">
+                                            <span className="text-gray-500 block mb-1">Address:</span>
+                                            <p className="text-midnight bg-gray-50 p-2 rounded border border-gray-100 whitespace-pre-wrap leading-relaxed">{order.customer.address}</p>
+                                          </div>
+                                        )}
+                                        {order.status === 'Out for Delivery' && (
+                                          <div className="pt-4 mt-4 border-t border-gray-100">
+                                            <button 
+                                              onClick={() => handleSendOTP(order.id)}
+                                              className="w-full py-2 bg-electric text-white font-bold rounded-xl hover:bg-electric/90 transition-all shadow-md shadow-electric/20 text-sm"
+                                            >
+                                              Send Delivery OTP
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
 
                                   {/* Order Items Table */}
                                   <div className="md:col-span-2 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
