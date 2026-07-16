@@ -153,6 +153,7 @@ export function AdminDashboard() {
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [deliveryOtps, setDeliveryOtps] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     if (!currentUser || !['owner', 'admin', 'staff'].includes(currentUser.role)) {
@@ -296,6 +297,40 @@ export function AdminDashboard() {
     } catch (e) {
       console.error(e);
       showAlert.error("Error", "An error occurred while sending OTP.");
+    }
+  };
+
+  const handleVerifyOTP = async (orderId: string) => {
+    const otp = deliveryOtps[orderId];
+    if (!otp || otp.length !== 6) {
+      showAlert.error("Error", "Please enter a valid 6-digit OTP");
+      return;
+    }
+    
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const res = await fetch('/api/verify-delivery-otp', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ orderId, otp })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showAlert.success("Success", "Delivery verified! Order marked as Delivered.");
+        setDeliveryOtps(prev => {
+          const newState = {...prev};
+          delete newState[orderId];
+          return newState;
+        });
+      } else {
+        showAlert.error("Error", data.error || "Failed to verify OTP");
+      }
+    } catch (e) {
+      console.error(e);
+      showAlert.error("Error", "An error occurred while verifying OTP.");
     }
   };
 
@@ -619,13 +654,29 @@ export function AdminDashboard() {
                                           </div>
                                         )}
                                         {order.status === 'Out for Delivery' && (
-                                          <div className="pt-4 mt-4 border-t border-gray-100">
+                                          <div className="pt-4 mt-4 border-t border-gray-100 space-y-3">
                                             <button 
                                               onClick={() => handleSendOTP(order.id)}
                                               className="w-full py-2 bg-electric text-white font-bold rounded-xl hover:bg-electric/90 transition-all shadow-md shadow-electric/20 text-sm"
                                             >
                                               Send Delivery OTP
                                             </button>
+                                            <div className="flex gap-2">
+                                              <input
+                                                type="text"
+                                                maxLength={6}
+                                                placeholder="Enter 6-digit OTP"
+                                                value={deliveryOtps[order.id] || ''}
+                                                onChange={(e) => setDeliveryOtps({...deliveryOtps, [order.id]: e.target.value})}
+                                                className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-midnight focus:border-electric focus:ring-1 focus:ring-electric/50"
+                                              />
+                                              <button
+                                                onClick={() => handleVerifyOTP(order.id)}
+                                                className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-700 transition-colors shadow-sm text-sm"
+                                              >
+                                                Verify
+                                              </button>
+                                            </div>
                                           </div>
                                         )}
                                       </div>
