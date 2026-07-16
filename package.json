@@ -23,7 +23,6 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
-    "resend": "^6.17.2",
     "sweetalert2": "^11.26.25",
     "tailwind-merge": "^3.6.0",
     "xlsx": "^0.18.5"

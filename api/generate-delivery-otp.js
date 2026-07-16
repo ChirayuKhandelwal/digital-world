@@ -1,10 +1,15 @@
 import { db } from './firebaseAdmin.js';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { withRole } from './auth/middleware.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -35,14 +40,14 @@ async function handler(req, res) {
       otpExpiry: otpExpiry
     });
 
-    // Send via Resend
+    // Send via Nodemailer
     const customerEmail = orderData.customer?.email;
     if (!customerEmail) {
       return res.status(400).json({ error: 'Customer email not found on order' });
     }
 
-    await resend.emails.send({
-      from: 'Digital World <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"Digital World" <${process.env.SMTP_USER}>`,
       to: customerEmail,
       subject: `Your Delivery OTP for Order #${orderId}`,
       html: `
