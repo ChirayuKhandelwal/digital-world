@@ -59,7 +59,7 @@ export function Navbar() {
             ))}
             {currentUser ? (
               <div className="flex items-center space-x-4">
-                {currentUser.role === 'admin' ? (
+                {['owner', 'admin', 'staff'].includes(currentUser.role) ? (
                   <Link to="/admin" className="text-sm font-medium text-electric hover:text-electric/80 transition-colors">
                     Dashboard
                   </Link>
@@ -97,9 +97,9 @@ export function Navbar() {
           <div className="flex items-center space-x-2 md:hidden shrink-0">
             {currentUser ? (
               <>
-                <Link to={currentUser.role === 'admin' ? "/admin" : "/cart"} className="relative p-2.5 text-coolgrey hover:text-electric transition-colors">
-                  {currentUser.role === 'admin' ? <User className="w-7 h-7 sm:w-8 sm:h-8" /> : <ShoppingCart className="w-7 h-7 sm:w-8 sm:h-8" />}
-                  {currentUser.role !== 'admin' && cartCount > 0 && (
+                <Link to={['owner', 'admin', 'staff'].includes(currentUser.role) ? "/admin" : "/cart"} className="relative p-2.5 text-coolgrey hover:text-electric transition-colors">
+                  {['owner', 'admin', 'staff'].includes(currentUser.role) ? <User className="w-7 h-7 sm:w-8 sm:h-8" /> : <ShoppingCart className="w-7 h-7 sm:w-8 sm:h-8" />}
+                  {!['owner', 'admin', 'staff'].includes(currentUser.role) && cartCount > 0 && (
                     <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-electric rounded-full">
                       {cartCount}
                     </span>
@@ -156,7 +156,7 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              {currentUser && currentUser.role !== 'admin' && (
+              {currentUser && !['owner', 'admin', 'staff'].includes(currentUser.role) && (
                 <Link
                   to="/profile"
                   onClick={() => setIsOpen(false)}
