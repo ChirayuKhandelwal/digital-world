@@ -15,8 +15,31 @@ export function Profile() {
     houseNo: '',
     landmark: '',
     area: '',
-    cityStatePincode: ''
+    pincode: '',
+    cityState: ''
   });
+  const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+
+  useEffect(() => {
+    if (editForm.pincode.length === 6) {
+      const fetchDetails = async () => {
+        setIsFetchingPincode(true);
+        try {
+          const res = await fetch(`https://api.postalpincode.in/pincode/${editForm.pincode}`);
+          const data = await res.json();
+          if (data && data[0]?.Status === 'Success' && data[0]?.PostOffice?.length > 0) {
+            const po = data[0].PostOffice[0];
+            setEditForm(prev => ({ ...prev, cityState: `${po.District}, ${po.State}` }));
+          }
+        } catch (error) {
+          console.error("Error fetching pincode details", error);
+        } finally {
+          setIsFetchingPincode(false);
+        }
+      };
+      fetchDetails();
+    }
+  }, [editForm.pincode]);
 
   const handleEditClick = () => {
     const parts = (currentUser?.address || "").split('\n');
@@ -30,20 +53,29 @@ export function Profile() {
       houseNo = currentUser?.address || '';
     }
 
+    const match = cityStatePincode.match(/(\d{6})$/);
+    let pincode = '';
+    let cityState = cityStatePincode;
+    if (match) {
+      pincode = match[1];
+      cityState = cityStatePincode.replace(/[\s-]*\d{6}$/, '').trim();
+    }
+
     setEditForm({
       name: currentUser?.name || '',
       mobile: currentUser?.mobile || '',
       houseNo,
       landmark,
       area,
-      cityStatePincode
+      pincode,
+      cityState
     });
     setIsEditing(true);
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formattedAddress = [editForm.houseNo, editForm.landmark, editForm.area, editForm.cityStatePincode]
+    const formattedAddress = [editForm.houseNo, editForm.landmark, editForm.area, `${editForm.cityState} - ${editForm.pincode}`]
       .filter(Boolean)
       .join('\n');
 
@@ -307,13 +339,28 @@ export function Profile() {
                     onChange={(e) => setEditForm(prev => ({ ...prev, area: e.target.value }))}
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
                   />
-                  <input
-                    type="text"
-                    placeholder="City - State - Pincode"
-                    value={editForm.cityStatePincode}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, cityStatePincode: e.target.value }))}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
-                  />
+                  <div className="flex gap-3">
+                    <div className="relative w-1/3">
+                      <input
+                        type="text"
+                        maxLength={6}
+                        placeholder="Pincode"
+                        value={editForm.pincode}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, pincode: e.target.value.replace(/\D/g, '') }))}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                      />
+                      {isFetchingPincode && <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-electric border-t-transparent rounded-full animate-spin"></div>}
+                    </div>
+                    <div className="w-2/3">
+                      <input
+                        type="text"
+                        placeholder="City, State"
+                        value={editForm.cityState}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, cityState: e.target.value }))}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="pt-4 flex gap-3">

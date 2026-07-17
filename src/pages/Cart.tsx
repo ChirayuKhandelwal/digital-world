@@ -25,11 +25,46 @@ export function Cart() {
     return { houseNo: addr, landmark: "", area: "", cityStatePincode: "" };
   };
 
+  const extractPincode = (csp: string) => {
+    const match = csp.match(/(\d{6})$/);
+    if (match) {
+      const pin = match[1];
+      const rest = csp.replace(/[\s-]*\d{6}$/, '').trim();
+      return { pin, rest };
+    }
+    return { pin: '', rest: csp };
+  };
+
   const initialAddr = parseAddress(currentUser?.address || "");
+  const extracted = extractPincode(initialAddr.cityStatePincode);
+
   const [houseNo, setHouseNo] = useState(initialAddr.houseNo);
   const [landmark, setLandmark] = useState(initialAddr.landmark);
   const [area, setArea] = useState(initialAddr.area);
-  const [cityStatePincode, setCityStatePincode] = useState(initialAddr.cityStatePincode);
+  const [pincode, setPincode] = useState(extracted.pin);
+  const [cityState, setCityState] = useState(extracted.rest);
+  const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+
+  useEffect(() => {
+    if (pincode.length === 6) {
+      const fetchDetails = async () => {
+        setIsFetchingPincode(true);
+        try {
+          const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+          const data = await res.json();
+          if (data && data[0]?.Status === 'Success' && data[0]?.PostOffice?.length > 0) {
+            const po = data[0].PostOffice[0];
+            setCityState(`${po.District}, ${po.State}`);
+          }
+        } catch (error) {
+          console.error("Error fetching pincode details", error);
+        } finally {
+          setIsFetchingPincode(false);
+        }
+      };
+      fetchDetails();
+    }
+  }, [pincode]);
 
   const [paymentMode, setPaymentMode] = useState<"Advance" | "Partial" | "COD">("Advance");
   const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -349,23 +384,38 @@ export function Cart() {
                   onChange={e => setArea(e.target.value)} 
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
                 />
-                <input 
-                  type="text" 
-                  placeholder="City - State - Pincode" 
-                  value={cityStatePincode} 
-                  onChange={e => setCityStatePincode(e.target.value)} 
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
-                />
+                <div className="flex gap-3">
+                  <div className="relative w-1/3">
+                    <input 
+                      type="text" 
+                      maxLength={6}
+                      placeholder="Pincode" 
+                      value={pincode} 
+                      onChange={e => setPincode(e.target.value.replace(/\D/g, ''))} 
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                    />
+                    {isFetchingPincode && <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-electric border-t-transparent rounded-full animate-spin"></div>}
+                  </div>
+                  <div className="w-2/3">
+                    <input 
+                      type="text" 
+                      placeholder="City, State" 
+                      value={cityState} 
+                      onChange={e => setCityState(e.target.value)} 
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
             <button 
               onClick={() => {
-                if (!name || !email || !phone || !houseNo || !area || !cityStatePincode) {
-                  showAlert.error("Missing Details", "Please fill in all mandatory customer details including address.");
+                if (!name || !email || !phone || !houseNo || !area || !cityState || !pincode) {
+                  showAlert.error("Missing Details", "Please fill in all mandatory customer details including address and pincode.");
                   return;
                 }
-                const formattedAddress = [houseNo, landmark, area, cityStatePincode]
+                const formattedAddress = [houseNo, landmark, area, `${cityState} - ${pincode}`]
                   .filter(Boolean)
                   .join('\n');
 
