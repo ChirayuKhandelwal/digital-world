@@ -2,7 +2,7 @@ import { useAppContext } from "../context/AppContext";
 import { Link } from "react-router-dom";
 import { Package, Clock, Truck, CheckCircle2, ShoppingBag, User as UserIcon, Mail, Phone, LogOut, Edit2, MapPin, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { showAlert } from "../utils/alert";
 
 export function Profile() {
