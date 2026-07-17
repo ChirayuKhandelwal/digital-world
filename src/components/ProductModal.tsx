@@ -74,7 +74,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
               transition={{ duration: 0.2 }}
               src={allImages[currentImageIndex]} 
               alt={`${product.name} - view ${currentImageIndex + 1}`}
-              className="w-full h-full object-cover absolute inset-0"
+              className="w-full h-full object-contain absolute inset-0"
             />
           </AnimatePresence>
           

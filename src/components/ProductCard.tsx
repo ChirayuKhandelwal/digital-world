@@ -41,7 +41,7 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
         <img 
           src={product.image} 
           alt={product.name}
-          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+          className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute bottom-4 left-4 z-20 flex gap-2">
           <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-medium text-white border border-white/30">
