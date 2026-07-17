@@ -11,7 +11,25 @@ export function Cart() {
   const [name, setName] = useState(currentUser?.name || "");
   const [email, setEmail] = useState(currentUser?.email || "");
   const [phone, setPhone] = useState(currentUser?.mobile || "");
-  const [address, setAddress] = useState(currentUser?.address || "");
+  const parseAddress = (addr: string) => {
+    const parts = (addr || "").split('\n');
+    if (parts.length >= 3) {
+      // Assuming at least 3 parts for a somewhat structured address
+      return { 
+        houseNo: parts[0] || '', 
+        landmark: parts.length === 4 ? parts[1] : '', 
+        area: parts[parts.length === 4 ? 2 : 1] || '', 
+        cityStatePincode: parts[parts.length === 4 ? 3 : 2] || '' 
+      };
+    }
+    return { houseNo: addr, landmark: "", area: "", cityStatePincode: "" };
+  };
+
+  const initialAddr = parseAddress(currentUser?.address || "");
+  const [houseNo, setHouseNo] = useState(initialAddr.houseNo);
+  const [landmark, setLandmark] = useState(initialAddr.landmark);
+  const [area, setArea] = useState(initialAddr.area);
+  const [cityStatePincode, setCityStatePincode] = useState(initialAddr.cityStatePincode);
 
   const [paymentMode, setPaymentMode] = useState<"Advance" | "Partial" | "COD">("Advance");
   const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -309,23 +327,50 @@ export function Cart() {
                 onChange={e => setPhone(e.target.value)} 
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
               />
-              <textarea 
-                placeholder="Delivery Address" 
-                value={address} 
-                onChange={e => setAddress(e.target.value)} 
-                rows={3}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors resize-none"
-              />
+              <div className="space-y-3">
+                <input 
+                  type="text" 
+                  placeholder="House No. / Flat No." 
+                  value={houseNo} 
+                  onChange={e => setHouseNo(e.target.value)} 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                />
+                <input 
+                  type="text" 
+                  placeholder="Landmark (Optional)" 
+                  value={landmark} 
+                  onChange={e => setLandmark(e.target.value)} 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                />
+                <input 
+                  type="text" 
+                  placeholder="Area / Locality" 
+                  value={area} 
+                  onChange={e => setArea(e.target.value)} 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                />
+                <input 
+                  type="text" 
+                  placeholder="City - State - Pincode" 
+                  value={cityStatePincode} 
+                  onChange={e => setCityStatePincode(e.target.value)} 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                />
+              </div>
             </div>
 
             <button 
               onClick={() => {
-                if (!name || !email || !phone || !address) {
-                  showAlert.error("Missing Details", "Please fill in all customer details including delivery address.");
+                if (!name || !email || !phone || !houseNo || !area || !cityStatePincode) {
+                  showAlert.error("Missing Details", "Please fill in all mandatory customer details including address.");
                   return;
                 }
+                const formattedAddress = [houseNo, landmark, area, cityStatePincode]
+                  .filter(Boolean)
+                  .join('\n');
+
                 placeOrder(
-                  { name, email, phone, address },
+                  { name, email, phone, address: formattedAddress },
                   paymentMode,
                   pricing.final_total,
                   {

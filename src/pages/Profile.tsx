@@ -12,21 +12,46 @@ export function Profile() {
   const [editForm, setEditForm] = useState({
     name: '',
     mobile: '',
-    address: ''
+    houseNo: '',
+    landmark: '',
+    area: '',
+    cityStatePincode: ''
   });
 
   const handleEditClick = () => {
+    const parts = (currentUser?.address || "").split('\n');
+    let houseNo = '', landmark = '', area = '', cityStatePincode = '';
+    if (parts.length >= 3) {
+      houseNo = parts[0] || '';
+      landmark = parts.length === 4 ? parts[1] : '';
+      area = parts[parts.length === 4 ? 2 : 1] || '';
+      cityStatePincode = parts[parts.length === 4 ? 3 : 2] || '';
+    } else {
+      houseNo = currentUser?.address || '';
+    }
+
     setEditForm({
       name: currentUser?.name || '',
       mobile: currentUser?.mobile || '',
-      address: currentUser?.address || ''
+      houseNo,
+      landmark,
+      area,
+      cityStatePincode
     });
     setIsEditing(true);
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await updateUserProfile(editForm);
+    const formattedAddress = [editForm.houseNo, editForm.landmark, editForm.area, editForm.cityStatePincode]
+      .filter(Boolean)
+      .join('\n');
+
+    const success = await updateUserProfile({
+      name: editForm.name,
+      mobile: editForm.mobile,
+      address: formattedAddress
+    });
     if (success) {
       showAlert.success("Success", "Profile updated successfully!");
       setIsEditing(false);
@@ -108,7 +133,7 @@ export function Profile() {
                 {currentUser.address && (
                   <div className="flex items-start gap-3">
                     <MapPin className="w-4 h-4 shrink-0 text-electric/70 mt-1" />
-                    <span className="break-words line-clamp-2">{currentUser.address}</span>
+                    <span className="break-words line-clamp-2">{currentUser.address.replace(/\n/g, ', ')}</span>
                   </div>
                 )}
               </div>
@@ -259,14 +284,35 @@ export function Profile() {
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
                   />
                 </div>
-                <div>
+                <div className="space-y-3">
                   <label className="block text-sm font-medium text-coolgrey mb-1">Address</label>
-                  <textarea
-                    rows={3}
-                    value={editForm.address}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, address: e.target.value }))}
-                    placeholder="Enter your delivery address..."
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors resize-none"
+                  <input
+                    type="text"
+                    placeholder="House No. / Flat No."
+                    value={editForm.houseNo}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, houseNo: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Landmark (Optional)"
+                    value={editForm.landmark}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, landmark: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Area / Locality"
+                    value={editForm.area}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, area: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
+                  />
+                  <input
+                    type="text"
+                    placeholder="City - State - Pincode"
+                    value={editForm.cityStatePincode}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, cityStatePincode: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-midnight focus:border-electric focus:ring-2 focus:ring-electric/50 focus:outline-none transition-colors"
                   />
                 </div>
                 
