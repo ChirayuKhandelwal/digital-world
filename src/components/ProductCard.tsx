@@ -34,30 +34,30 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       whileHover={{ y: -5 }}
-      className="group relative bg-white shadow-xl shadow-black/5 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-black/10 transition-all duration-300 cursor-pointer"
+      className="group relative bg-white shadow-xl shadow-black/5 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-black/10 transition-all duration-300 cursor-pointer flex flex-row h-32 sm:h-48 md:h-64"
     >
-      <div className="aspect-[4/3] overflow-hidden bg-gray-100 relative">
+      <div className="w-1/3 sm:w-64 shrink-0 h-full overflow-hidden bg-gray-100 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
         <img 
           src={product.image} 
           alt={product.name}
-          className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700"
+          className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700 p-2 sm:p-4"
         />
-        <div className="absolute bottom-4 left-4 z-20 flex gap-2">
-          <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-medium text-white border border-white/30">
+        <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 z-20 flex gap-1 sm:gap-2 flex-wrap">
+          <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] sm:text-xs font-medium text-white border border-white/30 truncate max-w-[80px] sm:max-w-none">
             {product.category}
           </span>
           {product.outOfStock && (
-            <span className="px-3 py-1 bg-red-500/80 backdrop-blur-md rounded-full text-xs font-medium text-white border border-red-500/50">
+            <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-red-500/80 backdrop-blur-md rounded-full text-[10px] sm:text-xs font-medium text-white border border-red-500/50">
               Out of Stock
             </span>
           )}
         </div>
       </div>
 
-      <div className="p-3 sm:p-6">
-        <h3 className="text-base sm:text-xl font-bold text-midnight mb-1 sm:mb-2 line-clamp-1 sm:line-clamp-none">{product.name}</h3>
-        <p className="text-coolgrey text-xs sm:text-sm line-clamp-2 mb-3 sm:mb-4">{product.description}</p>
+      <div className="p-3 sm:p-6 flex flex-col justify-center flex-1 overflow-hidden">
+        <h3 className="text-base sm:text-xl md:text-2xl font-bold text-midnight mb-1 sm:mb-2 truncate">{product.name}</h3>
+        <p className="text-coolgrey text-xs sm:text-sm md:text-base line-clamp-2 md:line-clamp-3 mb-2 sm:mb-4">{product.description}</p>
         
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-base sm:text-2xl font-bold text-midnight">
@@ -85,10 +85,11 @@ export function ProductCard({ product, onQuickView, onEdit, onDelete }: ProductC
               <button 
                 onClick={handleAddToCart}
                 disabled={product.outOfStock}
-                className={`p-1.5 sm:p-2 bg-electric hover:bg-electric/90 text-white rounded-lg shadow-md shadow-electric/20 transition-all ${product.outOfStock ? 'opacity-50 cursor-not-allowed hover:bg-electric' : ''}`}
+                className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-electric hover:bg-electric/90 text-white rounded-lg shadow-md shadow-electric/20 transition-all ${product.outOfStock ? 'opacity-50 cursor-not-allowed hover:bg-electric' : ''}`}
                 aria-label="Add to cart"
               >
                 <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm font-medium hidden sm:inline">Add to Cart</span>
               </button>
             )}
           </div>

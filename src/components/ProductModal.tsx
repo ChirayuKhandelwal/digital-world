@@ -104,7 +104,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
               </div>
             </>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent md:bg-gradient-to-r" />
         </div>
 
         {/* Content Section */}
