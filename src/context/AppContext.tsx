@@ -20,6 +20,7 @@ export interface Product {
   specs: string[];
   featured?: boolean;
   outOfStock?: boolean;
+  order?: number;
 }
 export type Role = 'owner' | 'admin' | 'staff' | 'customer';
 
@@ -81,6 +82,8 @@ interface AppContextType {
   addProduct: (product: Omit<Product, 'id'>) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (id: string) => void;
+  updateProductsOrder: (orderedProducts: Product[]) => Promise<void>;
+  moveProductOrder: (productId: string, direction: 'up' | 'down') => Promise<void>;
   
   // Auth state
   users: User[];
@@ -127,12 +130,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [toastMessage, setToastMessage] = useState("");
 
   // --- Products ---
+  const sortProducts = (prods: Product[]): Product[] => {
+    return [...prods].sort((a, b) => {
+      const orderA = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+      const orderB = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) return orderA - orderB;
+      return 0;
+    });
+  };
+
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem('digital_world_products');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { return initialProducts; }
+      try { return sortProducts(JSON.parse(saved)); } catch (e) { return sortProducts(initialProducts); }
     }
-    return initialProducts;
+    return sortProducts(initialProducts);
   });
 
   useEffect(() => {
@@ -147,22 +159,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         fetchedProducts.push({ ...doc.data(), id: doc.id } as Product);
       });
       if (fetchedProducts.length > 0) {
-        setProducts(fetchedProducts);
+        setProducts(sortProducts(fetchedProducts));
       }
     });
     return () => unsubscribe();
   }, []);
 
   const addProduct = async (productData: Omit<Product, 'id'>) => {
+    const maxOrder = products.length > 0 
+      ? Math.max(...products.map((p, idx) => (typeof p.order === 'number' ? p.order : idx))) + 1 
+      : 0;
+    const dataWithOrder = { ...productData, order: productData.order ?? maxOrder };
     if (db) {
       try {
-        await addDoc(collection(db, 'products'), productData);
+        await addDoc(collection(db, 'products'), dataWithOrder);
       } catch (e) {
         console.error("Error adding product: ", e);
       }
     } else {
-      const newProduct: Product = { ...productData, id: `p-${Date.now()}` };
-      setProducts(prev => [...prev, newProduct]);
+      const newProduct: Product = { ...dataWithOrder, id: `p-${Date.now()}` };
+      setProducts(prev => sortProducts([...prev, newProduct]));
     }
   };
 
@@ -176,7 +192,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         console.error("Error updating product: ", e);
       }
     } else {
-      setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+      setProducts(prev => sortProducts(prev.map(p => p.id === updatedProduct.id ? updatedProduct : p)));
     }
   };
 
@@ -188,8 +204,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         console.error("Error deleting product: ", e);
       }
     } else {
-      setProducts(prev => prev.filter(p => p.id !== id));
+      setProducts(prev => sortProducts(prev.filter(p => p.id !== id)));
     }
+  };
+
+  const updateProductsOrder = async (newOrderedProducts: Product[]) => {
+    const reindexed = newOrderedProducts.map((p, index) => ({ ...p, order: index }));
+    setProducts(reindexed);
+    localStorage.setItem('digital_world_products', JSON.stringify(reindexed));
+
+    if (db) {
+      try {
+        await Promise.all(
+          reindexed.map(async (p) => {
+            if (!p.id.startsWith('p-')) {
+              const productRef = doc(db, 'products', p.id);
+              await updateDoc(productRef, { order: p.order });
+            }
+          })
+        );
+      } catch (e) {
+        console.error("Error updating product orders in Firestore: ", e);
+      }
+    }
+  };
+
+  const moveProductOrder = async (productId: string, direction: 'up' | 'down') => {
+    const index = products.findIndex(p => p.id === productId);
+    if (index === -1) return;
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= products.length) return;
+
+    const newProducts = [...products];
+    const [movedProduct] = newProducts.splice(index, 1);
+    newProducts.splice(targetIndex, 0, movedProduct);
+
+    await updateProductsOrder(newProducts);
   };
 
   // --- Orders ---
@@ -612,7 +662,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      products, addProduct, updateProduct, deleteProduct,
+      products, addProduct, updateProduct, deleteProduct, updateProductsOrder, moveProductOrder,
       users, currentUser, register, login, loginWithGoogle, logout, resetPassword, updateUserProfile,
       sendOTP, verifyOTP,
       addToCart, removeFromCart, deleteFromCart, cartCount,

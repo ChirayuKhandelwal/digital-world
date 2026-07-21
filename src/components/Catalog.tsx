@@ -16,6 +16,8 @@ export function Catalog() {
   const location = useLocation();
   const [activeCategory, setActiveCategory] = useState<'All' | Category>('All');
   const [searchQuery, setSearchQuery] = useState("");
+  type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc';
+  const [sortBy, setSortBy] = useState<SortOption>('default');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -58,6 +60,13 @@ export function Catalog() {
     return matchesCategory && matchesSearch;
   });
 
+  const displayedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === 'price-asc') return a.price - b.price;
+    if (sortBy === 'price-desc') return b.price - a.price;
+    if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
+    return 0;
+  });
+
   return (
     <div id="catalog" className="w-full">
       <div className="bg-alabaster border-b border-gray-200 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
@@ -70,7 +79,7 @@ export function Catalog() {
           </div>
           
           {/* Action Buttons & Dropdown Filter */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto shrink-0 flex-wrap">
             {currentUser?.role === 'admin' && (
               <button 
                 onClick={handleAddNew}
@@ -92,28 +101,48 @@ export function Catalog() {
                 className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 hover:border-gray-300 rounded-xl text-midnight font-medium focus:outline-none focus:ring-2 focus:ring-electric/50 transition-all shadow-sm"
               />
             </div>
-            <div className="flex items-center relative w-full sm:w-72 shrink-0">
+            <div className="flex items-center relative w-full sm:w-60 shrink-0">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <SlidersHorizontal className="w-5 h-5 text-electric" />
               </div>
               <select
-              value={activeCategory}
-              onChange={(e) => setActiveCategory(e.target.value as 'All' | Category)}
-              className="w-full pl-12 pr-10 py-3 bg-white border border-gray-200 hover:border-gray-300 rounded-xl text-midnight font-medium focus:outline-none focus:ring-2 focus:ring-electric/50 appearance-none cursor-pointer transition-all shadow-sm"
-              style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
-            >
-              {CATEGORIES.map(category => (
-                <option key={category} value={category} className="bg-white text-midnight py-2">
-                  {category}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-              <ChevronDown className="w-5 h-5 text-coolgrey" />
+                value={activeCategory}
+                onChange={(e) => setActiveCategory(e.target.value as 'All' | Category)}
+                className="w-full pl-12 pr-10 py-3 bg-white border border-gray-200 hover:border-gray-300 rounded-xl text-midnight font-medium focus:outline-none focus:ring-2 focus:ring-electric/50 appearance-none cursor-pointer transition-all shadow-sm"
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+              >
+                {CATEGORIES.map(category => (
+                  <option key={category} value={category} className="bg-white text-midnight py-2">
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                <ChevronDown className="w-5 h-5 text-coolgrey" />
+              </div>
+            </div>
+
+            <div className="flex items-center relative w-full sm:w-56 shrink-0">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <SlidersHorizontal className="w-5 h-5 text-electric" />
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="w-full pl-12 pr-10 py-3 bg-white border border-gray-200 hover:border-gray-300 rounded-xl text-midnight font-medium focus:outline-none focus:ring-2 focus:ring-electric/50 appearance-none cursor-pointer transition-all shadow-sm"
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+              >
+                <option value="default">Default Sequence</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                <ChevronDown className="w-5 h-5 text-coolgrey" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       <motion.div 
@@ -121,7 +150,7 @@ export function Catalog() {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 md:gap-6 pt-12 pb-24"
       >
         <AnimatePresence mode="popLayout">
-          {filteredProducts.map(product => (
+          {displayedProducts.map(product => (
             <ProductCard 
               key={product.id} 
               product={product} 

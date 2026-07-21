@@ -15,7 +15,7 @@ import { auth, db } from '../lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 export function AdminDashboard() {
-  const { currentUser, products, addProduct, updateProduct, deleteProduct, orders, updateOrder, deleteOrder, coupons, addCoupon, updateCoupon, deleteCoupon, discountSettings, updateDiscountSettings } = useAppContext();
+  const { currentUser, products, addProduct, updateProduct, deleteProduct, moveProductOrder, orders, updateOrder, deleteOrder, coupons, addCoupon, updateCoupon, deleteCoupon, discountSettings, updateDiscountSettings } = useAppContext();
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -506,6 +506,7 @@ export function AdminDashboard() {
             <table className="w-full text-left text-sm text-coolgrey">
             <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
               <tr>
+                <th scope="col" className="px-4 py-4 text-center w-28">Order</th>
                 <th scope="col" className="px-6 py-4">Product Name</th>
                 <th scope="col" className="px-6 py-4">Category</th>
                 <th scope="col" className="px-6 py-4">Price</th>
@@ -514,42 +515,68 @@ export function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).map((product) => (
-                <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 font-bold text-midnight flex items-center space-x-3">
-                    <img src={product.image} alt={product.name} className="w-10 h-10 rounded object-cover border border-gray-200" />
-                    <span>{product.name}</span>
-                  </td>
-                  <td className="px-6 py-4">{product.category}</td>
-                  <td className="px-6 py-4 font-medium text-electric">₹{product.price.toLocaleString()}</td>
-                  <td className="px-6 py-4">
-                    {product.outOfStock ? (
-                      <span className="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-bold border border-red-200">Yes</span>
-                    ) : (
-                      <span className="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-medium border border-green-200">No</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <button 
-                      onClick={() => handleEdit(product)}
-                      className="p-2 bg-gray-50 hover:bg-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors border border-transparent hover:border-gray-200"
-                      title="Edit"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="p-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors border border-transparent hover:border-red-200"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).map((product) => {
+                const globalIndex = products.findIndex(p => p.id === product.id);
+                return (
+                  <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex items-center justify-center space-x-1">
+                        <span className="w-6 text-xs font-bold text-gray-500">{globalIndex + 1}</span>
+                        <div className="flex flex-col space-y-0.5">
+                          <button
+                            onClick={() => moveProductOrder(product.id, 'up')}
+                            disabled={globalIndex === 0 || !!productSearch}
+                            className="p-1 rounded bg-gray-100 hover:bg-electric hover:text-white disabled:opacity-30 disabled:hover:bg-gray-100 disabled:hover:text-current transition-colors"
+                            title={globalIndex === 0 ? "Already at top" : "Move Up"}
+                          >
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => moveProductOrder(product.id, 'down')}
+                            disabled={globalIndex === products.length - 1 || !!productSearch}
+                            className="p-1 rounded bg-gray-100 hover:bg-electric hover:text-white disabled:opacity-30 disabled:hover:bg-gray-100 disabled:hover:text-current transition-colors"
+                            title={globalIndex === products.length - 1 ? "Already at bottom" : "Move Down"}
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-midnight flex items-center space-x-3">
+                      <img src={product.image} alt={product.name} className="w-10 h-10 rounded object-cover border border-gray-200" />
+                      <span>{product.name}</span>
+                    </td>
+                    <td className="px-6 py-4">{product.category}</td>
+                    <td className="px-6 py-4 font-medium text-electric">₹{product.price.toLocaleString()}</td>
+                    <td className="px-6 py-4">
+                      {product.outOfStock ? (
+                        <span className="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-bold border border-red-200">Yes</span>
+                      ) : (
+                        <span className="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-medium border border-green-200">No</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button 
+                        onClick={() => handleEdit(product)}
+                        className="p-2 bg-gray-50 hover:bg-gray-200 rounded-lg text-coolgrey hover:text-midnight transition-colors border border-transparent hover:border-gray-200"
+                        title="Edit"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="p-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-500 hover:text-red-600 transition-colors border border-transparent hover:border-red-200"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
               {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
                     No products found. Add some to get started.
                   </td>
                 </tr>
